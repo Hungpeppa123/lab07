@@ -1,0 +1,2230 @@
+
+> cho tôi khung sườn giải quyết bài tập này
+
+● Failed to authenticate: OAuth session expired and could not be
+  refreshed
+
+> cho tôi khung sườn giải quyết bài tập này
+  ⎿  16 skills available
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Thư mục đang trống và máy chưa cài .NET SDK, nên mình tạo sẵn khung project C#
+  với chữ ký đầy đủ và các TODO để bạn tự cài đặt.
+
+● Write(Lab07.csproj)
+  ⎿  User rejected write to Lab07.csproj
+      1 <Project Sdk="Microsoft.NET.Sdk">
+      2
+      3   <PropertyGroup>
+      4     <OutputType>Exe</OutputType>
+      5     <TargetFramework>net8.0</TargetFramework>
+      6     <ImplicitUsings>enable</ImplicitUsings>
+      7     <Nullable>enable</Nullable>
+      8     <RootNamespace>Lab07</RootNamespace>
+      9   </PropertyGroup>
+     … +2 lines
+
+● Write(Domain\DeviceStatus.cs)
+  ⎿  User rejected write to Domain\DeviceStatus.cs
+      1 namespace Lab07.Domain;
+      2
+      3 public enum DeviceStatus
+      4 {
+      5     Available,
+      6     Borrowed,
+      7     UnderMaintenance
+      8 }
+
+● Write(Domain\IIdentifiable.cs)
+  ⎿  User rejected write to Domain\IIdentifiable.cs
+      1 namespace Lab07.Domain;
+      2
+      3 // Cho phép cấu trúc generic (repository) tìm đối tượng theo mã
+      4 // mà không cần biết lớp cụ thể.
+      5 public interface IIdentifiable
+      6 {
+      7     string Id { get; }
+      8 }
+  ⎿  Interrupted · What should Claude do instead?
+
+> với python nhé
+
+● Mình chuyển sang Python, ánh xạ abstract class → ABC + @abstractmethod,
+  interface → ABC/Protocol, generic → TypeVar + Generic[T], và where T : X →
+  TypeVar("T", bound=X).
+
+● Write(exceptions.py)
+  ⎿  Wrote 41 lines to exceptions.py
+       1 """Các ngoại lệ nghiệp vụ (mục 7)."""
+       2 from __future__ import annotations
+       3
+       4 from typing import TYPE_CHECKING
+       5
+       6 if TYPE_CHECKING:
+       7     from devices import DeviceStatus
+       8
+       9
+      10 class DeviceManagementError(Exception):
+     … +34 lines (ctrl+o to expand)
+
+● Write(devices.py)
+  ⎿  Wrote 144 lines to devices.py
+      1 """Mục 1 + 3: trạng thái, IIdentifiable, lớp trừu tượng và các lớ
+        p dẫn xuất."""
+      2 from __future__ import annotations
+      3
+      4 from abc import ABC, abstractmethod
+      5 from enum import Enum, auto
+      6 from typing import AbstractSet, Iterable
+      7
+      8 from exceptions import DeviceNotReadyException
+      9
+     … +151 lines (ctrl+o to expand)
+
+● Write(repository.py)
+  ⎿  Wrote 55 lines to repository.py
+       1 """Mục 4: kho lưu trữ generic."""
+       2 from __future__ import annotations
+       3
+       4 from abc import ABC, abstractmethod
+       5 from typing import Callable, Generic, Optional, Sequence, TypeVa
+       6
+       7 from devices import IIdentifiable
+       8 from exceptions import DuplicateIdException
+       9
+      10 # bound=IIdentifiable  <=>  where T : IIdentifiable
+     … +50 lines (ctrl+o to expand)
+
+● Write(strategies.py)
+  ⎿  Wrote 31 lines to strategies.py
+      1 """Mục 5: chiến lược lựa chọn (Strategy pattern + generic)."""
+      2 from __future__ import annotations
+      3
+      4 from abc import ABC, abstractmethod
+      5 from typing import Callable, Generic, Sequence, TypeVar
+      6
+      7 from exceptions import NoSuitableItemException
+      8
+      9 T = TypeVar("T")  # không ràng buộc: chiến lược dùng được cho mọi
+         kiểu
+     … +25 lines (ctrl+o to expand)
+
+● Write(allocation.py)
+  ⎿  Wrote 39 lines to allocation.py
+       1 """Mục 6: dịch vụ cấp phát generic.
+       2
+       3 KHÔNG dùng isinstance(device, ProjectorRemote)... ở đây.
+       4 Thêm InteractiveDisplayRemote thì file này không phải sửa.
+       5 """
+       6 from __future__ import annotations
+       7
+       8 from typing import Callable, Generic, Optional, TypeVar
+       9
+      10 from devices import TeachingDevice
+     … +35 lines (ctrl+o to expand)
+
+● Write(main.py)
+  ⎿  Wrote 73 lines to main.py
+      1 """Mục 9: kịch bản kiểm thử. Chạy: python main.py"""
+      2 from __future__ import annotations
+      3
+      5 from devices import AirConditionerRemote, ProjectorRemote, Wirele
+        ssMicrophone
+      6 from exceptions import DuplicateIdException, NoSuitableItemExcept
+        ion
+      8 from strategies import FirstAvailableStrategy, HighestPriorityStr
+        ategy
+      9
+     … +79 lines (ctrl+o to expand)
+
+● Write(DESIGN.md)
+  ⎿  Wrote 93 lines to DESIGN.md
+       1 # Lab 07 – Thiết kế (làm trước khi code)
+       2
+       3 ## 1. Sơ đồ lớp (Mermaid)
+       4
+       5 ```mermaid
+       6 classDiagram
+       7     class IIdentifiable {
+       8         <<interface>>
+       9         +id: str
+      10     }
+     … +88 lines (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Update(main.py)
+  ⎿  Added 1 line, removed 1 line
+      2  from __future__ import annotations
+      3  
+      4  from allocation import AllocationService
+      5 -from devices import AirConditionerRemote, ProjectorRemote, Wirel
+        -essMicrophone                                                   
+      5 +from devices import AirConditionerRemote, DeviceStatus, Projecto
+        +rRemote, WirelessMicrophone                                     
+      6  from exceptions import DuplicateIdException, NoSuitableItemExcep
+         tion
+      7  from repository import InMemoryRepository
+      8  from strategies import FirstAvailableStrategy, HighestPrioritySt
+         rategy
+
+● Mình đã tạo xong khung sườn bằng Python. Đã chạy thử python main.py: import
+  không lỗi và in ra đủ 11 tiêu đề kiểm thử. Các phần nghiệp vụ vẫn để TODO,
+  chưa cài đặt.
+
+  Cấu trúc
+
+  ┌───────────────┬───────────────────────────────────────────────┬─────────┐
+  │               │                                               │  Mục    │
+  │     File      │                   Nội dung                    │ trong   │
+  │               │                                               │   đề    │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │ DESIGN.md     │ Sơ đồ lớp UML (Mermaid) đã vẽ sẵn, kèm chỗ    │ 2, 8    │
+  │               │ trống cho các câu hỏi thiết kế 2.2 và 4.4     │         │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │ devices.py    │ DeviceStatus, IIdentifiable, TeachingDevice   │ 1, 3    │
+  │               │ (lớp trừu tượng) và 3 lớp con                 │         │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │ exceptions.py │ 3 ngoại lệ, đã viết xong                      │ 7       │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │ repository.py │ IRepository[T], InMemoryRepository[T]         │ 4       │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │               │ ISelectionStrategy[T],                        │         │
+  │ strategies.py │ HighestPriorityStrategy,                      │ 5       │
+  │               │ FirstAvailableStrategy                        │         │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │ allocation.py │ AllocationService[T]                          │ 6       │
+  ├───────────────┼───────────────────────────────────────────────┼─────────┤
+  │ main.py       │ Dữ liệu mẫu (3 điều khiển máy chiếu, 2 điều   │ 9       │
+  │               │ khiển điều hòa, 3 micro) và 11 mục kiểm thử   │         │
+  └───────────────┴───────────────────────────────────────────────┴─────────┘
+
+  Cách chuyển từ C# sang Python
+  - abstract class / interface → kế thừa ABC và đánh dấu @abstractmethod.
+  - where T : IIdentifiable → TypeVar("T", bound=IIdentifiable).
+    AllocationService cũng làm tương tự với bound=TeachingDevice.
+  - Predicate<T> / Func<T,double> → Callable[[T], bool] / Callable[[T], float].
+  - IReadOnlySet → frozenset. GetAll() trả về tuple để mã bên ngoài không sửa
+    được dữ liệu bên trong.
+  - Return() đổi tên thành return_device(), vì return là từ khóa của Python.
+  - protected set của Status → phương thức _set_status().
+
+  Thứ tự nên làm
+  1. Viết DESIGN.md trước, vì đề bắt thiết kế xong mới được cài đặt.
+  2. Cài devices.py, rồi repository.py, strategies.py, allocation.py.
+  3. Điền các TODO trong main.py. Mỗi mục đã ghi sẵn kết quả mong đợi theo dữ
+     liệu mẫu, ví dụ mục 5 phải chọn được PR01, mục 6 chọn AC02.
+
+  Có một chỗ đề bài không nói rõ: điều khiển điều hòa tính điểm ưu tiên "theo
+  phòng", nhưng get_default_priority_score() lại không có tham số phòng. Trong
+  TODO mình gợi ý tự đặt một quy ước, hoặc thêm hàm priority_for_room(room_id).
+  Bạn nên ghi lựa chọn của mình vào phần trade-off trong DESIGN.md.
+
+[Image #1]
+
+> đây là sơ đồ UML cho bài này từ đó tạo nên các bước để tôi tự code và hoàn
+  thiện dưa trên UML này
+
+● Trước tiên mình chỉnh khung code cho khớp với UML của bạn: đổi T thành D, thêm
+  strategy, find_candidates() và get_priority_score_for_room().
+● Write(allocation.py)
+  ⎿  Added 20 lines, removed 14 lines
+      11  from repository import IRepository
+      12  from strategies import ISelectionStrategy
+      13  
+      14 -# bound=TeachingDevice  <=>  where T : TeachingDevice          
+      15 -T = TypeVar("T", bound=TeachingDevice)                         
+      14 +# bound=TeachingDevice  <=>  where D : TeachingDevice          
+      15 +D = TypeVar("D", bound=TeachingDevice)                         
+      16  
+      17  
+      18 -class AllocationService(Generic[T]):                           
+      19 -    def __init__(self, repository: IRepository[T], strategy: IS
+         -electionStrategy[T]) -> None:                                  
+      18 +class AllocationService(Generic[D]):                           
+      19 +    def __init__(self, repository: IRepository[D], strategy: IS
+         +electionStrategy[D]) -> None:                                  
+      20          # TODO: kiểm tra None
+      21          self._repository = repository
+      22          self._strategy = strategy
+      23  
+      24 -    def change_strategy(self, new_strategy: ISelectionStrategy[
+         -T]) -> None:                                                   
+      24 +    @property                                                  
+      25 +    def strategy(self) -> ISelectionStrategy[D]:               
+      26 +        return self._strategy                                  
+      27 +                                                               
+      28 +    def change_strategy(self, new_strategy: ISelectionStrategy[
+         +D]) -> None:                                                   
+      29          # TODO: kiểm tra None rồi gán
+      30          raise NotImplementedError
+      31  
+      28 -    def allocate(self, additional_condition: Optional[Callable[
+         -[T], bool]] = None) -> T:                                      
+      29 -        # TODO:                                                
+      30 -        # 1. candidates = self._repository.find_all(lambda d: d
+         -.is_ready_for_use())   <- đa hình                              
+      31 -        # 2. nếu additional_condition không None -> lọc tiếp   
+      32 -        # 3. selected = self._strategy.select(candidates)      
+         -                        <- đa hình                             
+      33 -        # 4. selected.borrow()                                 
+      34 -        # 5. return selected                                   
+      32 +    def find_candidates(self, condition: Optional[Callable[[D],
+         + bool]] = None) -> tuple[D, ...]:                              
+      33 +        # TODO: lấy từ repository các thiết bị is_ready_for_use
+         +() (đa hình)                                                   
+      34 +        #       và thỏa condition nếu condition không None     
+      35          raise NotImplementedError
+      36  
+      37 -    def return_device(self, device_id: str) -> T:              
+      38 -        # TODO (nghiệp vụ "trả thiết bị về kho"): find_by_id, N
+         -one -> lỗi, gọi return_device()                                
+      37 +    def allocate(self, condition: Optional[Callable[[D], bool]]
+         + = None) -> D:                                                 
+      38 +        # TODO: candidates = find_candidates(condition)        
+      39 +        #       selected = self._strategy.select(candidates)   
+         +<- đa hình                                                     
+      40 +        #       selected.borrow(); return selected             
+      41          raise NotImplementedError
+      42 +                                                               
+      43 +    def return_device(self, device_id: str) -> D:              
+      44 +        # TODO: find_by_id, None -> lỗi, gọi device.return_devi
+         +ce(), trả về device                                            
+      45 +        raise NotImplementedError                              
+
+● Update(devices.py)
+  ⎿  Added 4 lines, removed 1 line
+      116  
+      117      def get_default_priority_score(self) -> float:
+      118          # TODO: không có phòng cụ thể -> tự chọn quy ước (vd. 
+           100 nếu có ít nhất 1 phòng, ngược lại 0)
+      119 -        #       có thể thêm hàm priority_for_room(room_id) -> 
+          -100 / 0                                                       
+      119          raise NotImplementedError
+      120  
+      121 +    def get_priority_score_for_room(self, room_id: str) -> flo
+          +at:                                                           
+      122 +        # TODO: 100 nếu tương thích với room_id, ngược lại 0  
+      123 +        raise NotImplementedError                             
+      124  
+      125 +                                                              
+      126  class WirelessMicrophone(TeachingDevice):
+      127      def __init__(self, device_id: str, name: str, storage_loca
+           tion: str,
+      128                   battery_level: int, signal_quality: int) -> N
+           one:
+
+  Read 1 file (ctrl+o to expand)
+
+● Mình đã chỉnh khung code cho khớp với UML của bạn:
+  - allocation.py đổi tham số kiểu thành D và có thêm property strategy cùng hàm
+    find_candidates().
+  - AirConditionerRemote có thêm get_priority_score_for_room().
+
+  Các file đều còn để TODO. Bạn làm lần lượt theo các bước dưới đây, đi từ dưới
+  lên trên sơ đồ. Mỗi bước có một đoạn tự kiểm tra, cứ chạy trong python (REPL)
+  ở thư mục lab07.
+
+  ---
+
+  Bước 0: Phần đã có sẵn, chỉ cần đọc hiểu
+
+  - DeviceStatus (enumeration), IIdentifiable (interface) và 3 exception trong
+    exceptions.py.
+  - Đối chiếu với UML: {readonly} trong Python là @property không có setter.
+    Thuộc tính private - _x là biến có tiền tố _.
+
+  Bước 1: TeachingDevice (lớp abstract) trong devices.py
+
+  1. __init__: viết một hàm phụ kiểm tra chuỗi. Nếu chuỗi không phải str, hoặc
+     .strip() ra rỗng thì raise ValueError. Áp dụng cho cả device_id, name và
+     storage_location.
+  2. borrow(): nếu self.is_ready_for_use() trả về sai thì raise
+     DeviceNotReadyException(self.id, self.status), còn không thì
+     _set_status(BORROWED).
+     - Đây là đa hình (1) trong ghi chú UML: lớp cha gọi một hàm abstract, và
+       phiên bản của lớp con sẽ chạy.
+  3. return_device(): nếu status != BORROWED thì raise lỗi (có thể dùng lại
+     DeviceNotReadyException), còn không thì chuyển về AVAILABLE.
+
+  Chưa test được ở bước này vì lớp abstract không tạo đối tượng được. Bạn có thể
+  thử TeachingDevice("a","b","c"), kết quả phải là TypeError.
+
+  Bước 2: Ba lớp con
+
+  1. _validate_percent: giá trị ngoài khoảng [0, 100] thì raise ValueError.
+  2. ProjectorRemote: sẵn sàng khi AVAILABLE và pin ≥ 20. Điểm ưu tiên bằng
+     float(battery).
+  3. AirConditionerRemote:
+     - is_compatible_with: kiểm tra room_id in self._compatible_rooms.
+     - is_ready_for_use: chỉ cần AVAILABLE.
+     - get_priority_score_for_room: trả về 100 nếu tương thích, ngược lại 0.
+     - get_default_priority_score: bạn tự đặt quy ước rồi ghi vào DESIGN.md. Ví
+       dụ: 100 nếu có ít nhất một phòng tương thích.
+  4. WirelessMicrophone: sẵn sàng khi AVAILABLE, pin ≥ 30 và tín hiệu ≥ 40. Điểm
+     bằng (pin + tín hiệu) / 2.
+
+  from devices import *
+  p = ProjectorRemote("P1","Remote","Kho A",15); print(p.is_ready_for_use())   #
+  False
+  m = WirelessMicrophone("M1","Mic","Kho C",70,50);
+  print(m.get_default_priority_score())  # 60.0
+  m.borrow(); print(m.status)        # DeviceStatus.BORROWED
+  m.return_device(); print(m.status) # DeviceStatus.AVAILABLE
+  p.borrow()                         # DeviceNotReadyException
+
+  Bước 3: InMemoryRepository[T] trong repository.py
+
+  ┌────────────┬─────────────────────────────────────────────────────────────┐
+  │    Hàm     │                        Việc cần làm                         │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ add        │ item is None thì ValueError. Nếu item.id in self._items thì │
+  │            │  DuplicateIdException(item.id)                              │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ remove     │ Có thì del rồi trả về True, không có thì trả về False       │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ find_by_id │ self._items.get(item_id)                                    │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ get_all    │ tuple(self._items.values()), để bên ngoài không sửa được dữ │
+  │            │  liệu bên trong                                             │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ find_all   │ tuple(x for x in ... if condition(x))                       │
+  └────────────┴─────────────────────────────────────────────────────────────┘
+
+  from repository import InMemoryRepository; from devices import *
+  r = InMemoryRepository(); r.add(ProjectorRemote("P1","R","A",80))
+  r.add(ProjectorRemote("P1","R","A",50))   # DuplicateIdException
+  print(r.find_by_id("X"), r.remove("X"))   # None False
+
+  Bước 4: Các strategy trong strategies.py
+
+  - Cả hai chiến lược: nếu candidates rỗng thì raise NoSuitableItemException().
+  - FirstAvailableStrategy: trả về candidates[0].
+  - HighestPriorityStrategy: trả về max(candidates, key=self._score_selector).
+    Dùng max vì nó không sửa list đầu vào, còn sort() thì sửa list.
+
+  from strategies import *
+  print(HighestPriorityStrategy(lambda x: x).select([3, 9, 5]))  # 9
+  FirstAvailableStrategy().select([])                             #
+  NoSuitableItemException
+
+  Bước 5: AllocationService[D] trong allocation.py
+
+  1. __init__ và change_strategy: tham số None thì ValueError.
+  2. find_candidates(cond): gọi self._repository.find_all(...) với điều kiện
+     d.is_ready_for_use() and (cond is None or cond(d)).
+  3. allocate(cond): gọi find_candidates, rồi self._strategy.select(...) (đây là
+     đa hình (2)), rồi borrow(), cuối cùng return.
+  4. return_device(id): gọi find_by_id. Nếu None thì raise lỗi, còn không thì
+     gọi device.return_device() rồi trả về thiết bị.
+
+  ⚠️ Không được dùng isinstance(...) ở bất kỳ chỗ nào trong file này.
+
+  Bước 6: Điền 11 test trong main.py
+
+  Dữ liệu mẫu đã có sẵn. Kết quả mong đợi:
+
+  ┌─────┬───────────────────────────────────────────────────────────────────┐
+  │  #  │                              Kỳ vọng                              │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 4   │ Máy chiếu sẵn sàng: PR01 và PR03 (PR02 có pin 15 nên bị loại)     │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 5   │ HighestPriority chọn PR01                                         │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 6   │ Phòng A203 chọn AC02                                              │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 7   │ FirstAvailable chọn MI02 (MI01 có pin 25 nên bị loại)             │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 8   │ Đổi sang HighestPriority rồi cấp phát tiếp: chọn MI03             │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 9   │ Phòng Z999 gây NoSuitableItemException                            │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 10  │ selected.status == DeviceStatus.BORROWED                          │
+  ├─────┼───────────────────────────────────────────────────────────────────┤
+  │ 11  │ In type(repo).__name__ của 3 repo: cả 3 đều là InMemoryRepository │
+  └─────┴───────────────────────────────────────────────────────────────────┘
+
+  Lưu ý ở test 8: MI02 đã bị mượn ở test 7, nên kết quả MI03 đến từ việc đổi
+  chiến lược. Muốn so sánh công bằng thì gọi return_device("MI02") trước, khi đó
+  vẫn phải ra MI03.
+
+  Bạn có thể dùng thêm get_priority_score_for_room như một ví dụ khác cho test
+  6:
+  HighestPriorityStrategy(lambda d: d.get_priority_score_for_room("A203"))
+
+  Bước 7: Hoàn thiện DESIGN.md
+
+  - Nếu nộp ảnh UML của bạn thì có thể thay khối Mermaid bằng ảnh đó.
+  - Mục 4 và mục 5 lấy gần như nguyên văn từ ô "Ghi chú" trong UML.
+  - Trade-off: dùng dict thì tìm theo id nhanh (O(1)) và chặn trùng id dễ, nhưng
+    phải dựa vào việc dict giữ thứ tự chèn để "phần tử đầu tiên" có nghĩa. Dùng
+    list thì đơn giản, nhưng tìm và kiểm tra trùng mất O(n).
+  - Bonus để chứng minh mở rộng được: viết thêm
+    InteractiveDisplayRemote(TeachingDevice) ngay trong main.py, rồi cho nó chạy
+    qua AllocationService mà không sửa file nào khác.
+
+  Khi làm xong bước nào, bạn gửi code lên để mình review.
+
+> xóa hết các phần b code sẵn đi
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Mình đã xóa 6 file .py mình tạo trước đó: devices.py, exceptions.py,
+  repository.py, strategies.py, allocation.py, main.py, cùng thư mục __pycache__
+  sinh ra khi chạy thử.
+
+  Trong thư mục giờ chỉ còn DESIGN.md. File này không phải code: nó có sơ đồ
+  Mermaid và các mục thiết kế còn để trống. Nếu muốn xóa luôn, bạn nhắn mình
+  nhé.
+
+  Các bước trong tin nhắn trước vẫn dùng được, bạn chỉ cần tự tạo các file theo
+  đúng thứ tự đó, bắt đầu từ devices.py và exceptions.py.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\DESIGN.md in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> xóa cả design
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Mình đã xóa DESIGN.md. Thư mục lab07 giờ trống hoàn toàn. Bạn có thể bắt đầu
+  code từ đầu theo UML.
+
+> có nhất thiết phải tạo các file khác nhau như các buosc kia kh? tôi có nên
+  làm chung trong 1 file model k?
+
+● Không bắt buộc. Python không yêu cầu mỗi lớp một file như Java hay C#. Bài này
+  khoảng 300 dòng, nên gộp lại là hợp lý.
+
+  Mình gợi ý dùng 2 file:
+
+  lab07/
+  ├── models.py   # toàn bộ lớp trong UML
+  └── main.py     # 11 test, chỉ import từ models
+
+  Tách main.py riêng vì các lý do sau:
+  - Phần lớp và phần chạy thử không lẫn vào nhau, nên dễ đọc và dễ chấm.
+  - Câu "thêm loại thiết bị mới mà không sửa lớp cũ" sẽ dễ chứng minh hơn. Bạn
+    chỉ cần viết InteractiveDisplayRemote trong main.py, còn models.py giữ
+    nguyên.
+
+  Nếu muốn gọn hơn nữa thì dồn tất cả vào 1 file cũng được. Khi đó đặt phần test
+  trong if __name__ == "__main__": ở cuối file.
+
+  Thứ tự lớp trong models.py (lớp nào được dùng thì phải khai báo trước):
+  1. Exceptions
+  2. DeviceStatus, IIdentifiable
+  3. TeachingDevice, sau đó 3 lớp con
+  4. IRepository, InMemoryRepository
+  5. ISelectionStrategy, rồi 2 strategy
+  6. AllocationService
+
+  Đặt from __future__ import annotations ở dòng đầu file, để type hint có thể
+  nhắc tới lớp được khai báo phía dưới.
+
+  Nếu đề hoặc giảng viên yêu cầu cấu trúc thư mục cụ thể thì bạn làm theo yêu
+  cầu đó. Đề bạn gửi không quy định chuyện này.
+
+> rồi tạo lại các bước với 2 file
+
+● Bạn tự code, mình chỉ gợi ý. Sau mỗi bước, mở python trong thư mục lab07 và
+  chạy đoạn tự kiểm tra kèm theo.
+
+  Phần A: models.py
+
+  Bước 1: Đầu file và các exception
+
+  - Dòng đầu: from __future__ import annotations.
+  - Import: ABC, abstractmethod, Enum, auto, và từ typing lấy Generic, TypeVar,
+    Callable, Optional, Sequence, Iterable, AbstractSet.
+  - Viết một lớp cha DeviceManagementError(Exception), rồi 3 lớp con của nó:
+    - DuplicateIdException(duplicate_id): có property duplicate_id.
+    - NoSuitableItemException()
+    - DeviceNotReadyException(device_id, current_status): có 2 property tương
+      ứng.
+  - Nhớ gọi super().__init__(message) để khi in lỗi có thông báo dễ đọc.
+
+  Bước 2: DeviceStatus và IIdentifiable
+
+  - DeviceStatus(Enum) có 3 giá trị AVAILABLE, BORROWED, UNDER_MAINTENANCE.
+  - IIdentifiable(ABC) có một property abstract id. Viết @property rồi đến
+    @abstractmethod, đúng thứ tự đó.
+
+  Bước 3: TeachingDevice(IIdentifiable) (lớp abstract)
+
+  - __init__(device_id, name, storage_location):
+    - Kiểm tra cả 3 chuỗi: không rỗng, không chỉ toàn khoảng trắng. Sai thì
+      ValueError.
+    - Gán _status = AVAILABLE.
+  - Các property chỉ đọc: id, name, storage_location, status.
+  - _set_status(s): dùng nội bộ, thay cho protected set.
+  - Hai hàm abstract: is_ready_for_use() và get_default_priority_score().
+  - borrow(): nếu chưa sẵn sàng thì DeviceNotReadyException, còn không thì
+    chuyển sang BORROWED.
+  - return_device(): nếu trạng thái khác BORROWED thì raise lỗi, còn không thì
+    chuyển về AVAILABLE.
+  - Nên thêm __repr__ để lúc in ra dễ đọc, ví dụ ProjectorRemote(PR01, ...,
+    AVAILABLE).
+
+  from models import TeachingDevice
+  TeachingDevice("a","b","c")   # phải ra TypeError
+
+  Bước 4: Ba lớp con
+
+  - Viết hàm phụ _validate_percent(value): giá trị ngoài khoảng [0, 100] thì
+    ValueError.
+
+  Lớp: ProjectorRemote
+  Thuộc tính: battery_level
+  is_ready_for_use: AVAILABLE và pin ≥ 20
+  Điểm ưu tiên: pin
+  ────────────────────────────────────────
+  Lớp: AirConditionerRemote
+  Thuộc tính: compatible_rooms (lưu bằng frozenset)
+  is_ready_for_use: AVAILABLE
+  Điểm ưu tiên: mặc định: tự đặt quy ước
+  ────────────────────────────────────────
+  Lớp: WirelessMicrophone
+  Thuộc tính: battery_level, signal_quality
+  is_ready_for_use: AVAILABLE, pin ≥ 30, tín hiệu ≥ 40
+  Điểm ưu tiên: (pin + tín hiệu) / 2
+
+  AirConditionerRemote có thêm 2 hàm:
+  - is_compatible_with(room_id)
+  - get_priority_score_for_room(room_id): trả về 100 nếu tương thích, ngược
+    lại 0.
+
+  from models import *
+  p = ProjectorRemote("P1","R","Kho A",15); print(p.is_ready_for_use())   #
+  False
+  m = WirelessMicrophone("M1","Mic","Kho C",70,50);
+  print(m.get_default_priority_score())  # 60.0
+  m.borrow(); print(m.status); m.return_device(); print(m.status)  # BORROWED
+  rồi AVAILABLE
+  p.borrow()   # DeviceNotReadyException
+
+  Bước 5: Repository generic
+
+  - Khai báo T = TypeVar("T", bound=IIdentifiable).
+  - IRepository(ABC, Generic[T]) có 5 hàm abstract: add, remove, find_by_id,
+    get_all, find_all.
+  - InMemoryRepository(IRepository[T]) lưu dữ liệu trong self._items: dict[str,
+    T].
+
+  ┌────────────────┬─────────────────────────────────────────────────────────┐
+  │      Hàm       │                      Việc cần làm                       │
+  ├────────────────┼─────────────────────────────────────────────────────────┤
+  │ add            │ None thì ValueError. Trùng id thì DuplicateIdException  │
+  ├────────────────┼─────────────────────────────────────────────────────────┤
+  │ remove         │ Trả về True nếu xóa được, False nếu không tìm thấy      │
+  ├────────────────┼─────────────────────────────────────────────────────────┤
+  │ find_by_id     │ .get(), không có thì trả về None                        │
+  ├────────────────┼─────────────────────────────────────────────────────────┤
+  │ get_all        │ Trả về tuple(...), không trả về chính dict hay list bên │
+  │                │  trong                                                  │
+  ├────────────────┼─────────────────────────────────────────────────────────┤
+  │ find_all(cond) │ Trả về tuple các phần tử thỏa cond                      │
+  └────────────────┴─────────────────────────────────────────────────────────┘
+
+  from models import *
+  r = InMemoryRepository(); r.add(ProjectorRemote("P1","R","A",80))
+  r.add(ProjectorRemote("P1","R","A",50))   # DuplicateIdException
+  print(r.find_by_id("X"), r.remove("X"))   # None False
+
+  Bước 6: Các strategy
+
+  - Khai báo S = TypeVar("S"), không ràng buộc gì.
+  - ISelectionStrategy(ABC, Generic[S]) có hàm abstract select(candidates).
+  - Cả hai chiến lược: nếu danh sách rỗng thì NoSuitableItemException.
+  - FirstAvailableStrategy: trả về candidates[0].
+  - HighestPriorityStrategy(score_selector): dùng max(candidates, key=...).
+    Không dùng sort(), vì sort() sửa danh sách đầu vào.
+
+  from models import *
+  print(HighestPriorityStrategy(lambda x: x).select([3, 9, 5]))  # 9
+  FirstAvailableStrategy().select([])                             #
+  NoSuitableItemException
+
+  Bước 7: AllocationService(Generic[D])
+
+  - Khai báo D = TypeVar("D", bound=TeachingDevice).
+  - __init__(repository, strategy): tham số None thì ValueError.
+  - Property chỉ đọc strategy, và hàm change_strategy(s).
+  - find_candidates(cond=None): lấy các thiết bị is_ready_for_use() và thỏa cond
+    (nếu có cond).
+  - allocate(cond=None): gọi find_candidates, rồi strategy.select, rồi borrow(),
+    cuối cùng trả về thiết bị.
+  - return_device(device_id): gọi find_by_id. Nếu None thì raise lỗi, còn không
+    thì gọi return_device() của thiết bị rồi trả về nó.
+  - ⚠️ Không dùng isinstance ở bất kỳ đâu trong lớp này.
+
+  ---
+
+  Phần B: main.py
+
+  Bước 8: Dữ liệu mẫu
+
+  - from models import *
+  - Tạo 3 máy chiếu, ví dụ pin 85, 15 và 60.
+  - Tạo 2 điều hòa: {"A201","A202"} và {"A203","B101"}.
+  - Tạo 3 micro, ví dụ (pin 25, tín hiệu 90), (70, 50) và (95, 80).
+  - Tạo 3 repo bằng cùng một lớp InMemoryRepository.
+
+  Bước 9: 11 test
+
+  Mỗi test nên in một tiêu đề, ví dụ === 5. ... ===.
+
+  ┌─────┬────────────────────────────────────────┬──────────────────────────┐
+  │  #  │                Cách làm                │  Kỳ vọng (theo dữ liệu   │
+  │     │                                        │          trên)           │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 1   │ add tất cả, in get_all()               │ 3 / 2 / 3 thiết bị       │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 2   │ add trùng PR01 trong try/except        │ In ra id bị trùng        │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 3   │ find_by_id("PR03") và                  │ Tìm được PR03, còn "XXX" │
+  │     │ find_by_id("XXX")                      │  ra None                 │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 4   │ find_all(lambda d:                     │ PR01, PR03               │
+  │     │ d.is_ready_for_use())                  │                          │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 5   │ HighestPriorityStrategy(lambda d:      │ PR01                     │
+  │     │ d.get_default_priority_score())        │                          │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 6   │ allocate(lambda d:                     │ AC02                     │
+  │     │ d.is_compatible_with("A203"))          │                          │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 7   │ FirstAvailableStrategy                 │ MI02                     │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │     │ return_device("MI02"), rồi             │                          │
+  │ 8   │ change_strategy(Highest...), rồi       │ MI03                     │
+  │     │ allocate                               │                          │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 9   │ allocate(... "Z999") trong try/except  │ NoSuitableItemException  │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 10  │ In selected.status                     │ BORROWED                 │
+  ├─────┼────────────────────────────────────────┼──────────────────────────┤
+  │ 11  │ In type(repo).__name__ của cả 3 repo   │ Cả 3 đều là              │
+  │     │                                        │ InMemoryRepository       │
+  └─────┴────────────────────────────────────────┴──────────────────────────┘
+
+  Bước 10 (bonus): chứng minh mở rộng được
+
+  Viết class InteractiveDisplayRemote(TeachingDevice) ngay trong main.py, có đủ
+  2 hàm abstract. Tạo repo và service cho nó rồi gọi allocate. Trong suốt quá
+  trình đó, models.py không bị sửa dòng nào.
+
+  ---
+
+  Làm xong bước nào, bạn dán code vào đây để mình review.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\models.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> future kia là gì, có chức năng
+
+● from __future__ import annotations thay đổi cách Python xử lý type hint: các
+  gợi ý kiểu không còn bị tính ngay khi định nghĩa hàm hay lớp nữa, mà được lưu
+  lại dưới dạng chuỗi.
+
+  Vì sao cần
+
+  Bình thường Python sẽ tính type hint ngay lúc chạy tới dòng def. Nếu hint nhắc
+  tới một lớp chưa được khai báo thì chương trình báo lỗi:
+
+  class DeviceNotReadyException(Exception):
+      def __init__(self, device_id: str, current_status: DeviceStatus):  #
+  NameError!
+          ...
+
+  class DeviceStatus(Enum):   # khai báo SAU nên Python chưa biết tên này
+      ...
+
+  Thêm dòng from __future__ import annotations ở đầu file thì đoạn trên chạy
+  bình thường, vì DeviceStatus lúc này chỉ là một chuỗi, chưa cần tồn tại.
+
+  Trong bài này, nó giúp ở mấy chỗ:
+  1. Exception nhắc tới DeviceStatus, mà DeviceStatus lại khai báo phía sau.
+  2. Lớp nhắc tới chính nó trong hint, ví dụ một hàm trả về TeachingDevice nằm
+     ngay trong lớp TeachingDevice.
+  3. Bạn được viết T | None thay cho Optional[T], kể cả trên các bản Python cũ.
+
+  Lưu ý
+  - Nó chỉ ảnh hưởng tới type hint. Logic chương trình không đổi, và Python vẫn
+    không kiểm tra kiểu khi chạy.
+  - Dòng này phải đặt đầu tiên trong file, chỉ docstring hoặc comment được đứng
+    trước.
+  - Từ Python 3.14 trở đi, type hint mặc định đã được tính trễ, nên dòng này gần
+    như không còn cần thiết. Giữ lại thì vẫn vô hại và chạy được trên mọi bản.
+  - Nếu bạn sắp xếp lớp đúng thứ tự (lớp được dùng khai báo trước) thì có thể bỏ
+    dòng này. Nhưng cứ thêm vào cho đỡ phải để ý thứ tự.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\models.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> check bước 1 và 2
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bước 1 và 2 đều đúng. Mình đã chạy thử: 3 exception tạo được và in đúng thông
+  báo, duplicate_id lấy ra đúng, cả 3 đều kế thừa DeviceManagementError, còn
+  IIdentifiable() thì báo TypeError như mong đợi.
+
+  Có 3 chỗ nên sửa cho gọn, không cái nào là lỗi:
+
+  1. Thông báo lỗi in ra hơi xấu. Hiện nó in trạng thái hiện tại:
+  DeviceStatus.BORROWED. Đổi sang {current_status.name} thì sẽ in BORROWED.
+
+  2. Thiếu type hint. UML của bạn có ghi kiểu dữ liệu, nên thêm vào để code khớp
+  với sơ đồ:
+  def __init__(self, duplicate_id: str) -> None:
+  def duplicate_id(self) -> str:
+  def __init__(self, device_id: str, current_status: DeviceStatus) -> None:
+  def id(self) -> str:
+  Ở đây thấy luôn tác dụng của from __future__ import annotations: DeviceStatus
+  được khai báo sau DeviceNotReadyException, vậy mà hint vẫn không báo lỗi.
+
+  3. Định dạng code. Theo PEP 8, giữa các lớp nên cách 2 dòng trống, giữa các
+  hàm trong cùng lớp cách 1 dòng. Code hiện tại các lớp dính sát nhau nên khó
+  đọc. Dòng 48 còn khoảng trắng thừa, nên xóa đi.
+
+  Làm tiếp bước 3 (TeachingDevice) được rồi.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\models.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> bước 3
+
+  Read 1 file (ctrl+o to expand)
+
+● File models.py hiện mới tới hết IIdentifiable (dòng 61), chưa có
+  TeachingDevice. Nếu bạn đã viết rồi thì có thể chưa lưu, hãy bấm Ctrl+S rồi
+  nhắn lại để mình check.
+
+  Nếu bạn cần gợi ý để bắt đầu bước 3 thì đây là phần khung. Phần thân hàm bạn
+  tự điền:
+
+  class TeachingDevice(IIdentifiable):
+
+      def __init__(self, device_id: str, name: str, storage_location: str) ->
+  None:
+          # 1. kiểm tra 3 tham số -> gọi hàm phụ _require_text(...)
+          # 2. gán self._id, self._name, self._storage_location
+          # 3. self._status = ?  (trạng thái ban đầu)
+          ...
+
+      @staticmethod
+      def _require_text(value, field: str) -> str:
+          # không phải str HOẶC value.strip() == ""  -> raise
+  ValueError(f"{field} ...")
+          # hợp lệ -> return value
+          ...
+
+      # 4 property chỉ đọc: id, name, storage_location, status
+      # (chỉ @property, KHÔNG viết @xxx.setter)
+
+      def _set_status(self, status: DeviceStatus) -> None:
+          ...
+
+      @abstractmethod
+      def is_ready_for_use(self) -> bool: ...
+
+      @abstractmethod
+      def get_default_priority_score(self) -> float: ...
+
+      def borrow(self) -> None:
+          # chưa sẵn sàng -> raise DeviceNotReadyException(self.id, self.status)
+          # ngược lại -> _set_status(...)
+          ...
+
+      def return_device(self) -> None:
+          # status khác BORROWED -> raise (gợi ý: DeviceNotReadyException)
+          # ngược lại -> về AVAILABLE
+          ...
+
+      def __repr__(self) -> str:
+          # vd: "ProjectorRemote(PR01, Remote 1, AVAILABLE)"
+          # gợi ý: type(self).__name__ cho ra tên lớp con thật sự
+          ...
+
+  Mấy chỗ dễ sai:
+  - Lớp này phải kế thừa IIdentifiable, và vì có property id nên nó đã thực hiện
+    đủ phần abstract của IIdentifiable.
+  - Trong borrow(), hãy gọi self.is_ready_for_use() chứ đừng tự kiểm tra
+    self._status. Như vậy mỗi lớp con tự quyết định thế nào là sẵn sàng (pin,
+    tín hiệu…). Đây chính là đa hình (1) trong UML.
+  - Đừng đặt tên hàm là return, vì đó là từ khóa của Python.
+  - Chỉ kiểm tra value.strip() sau khi đã chắc value là chuỗi. Nếu không, truyền
+    None vào sẽ gây AttributeError thay vì ValueError.
+
+  Viết xong, bạn có thể tự kiểm tra bằng:
+  from models import *
+  TeachingDevice("a", "b", "c")    # TypeError: lớp abstract
+  Các hàm borrow và return_device chưa test được, phải đợi bước 4 khi có lớp
+  con.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\models.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> lớp này là lớp cha của các thiết bị pk nhm tại sao phải thừa kế
+  IIDentifiabale
+
+● Đúng vậy, TeachingDevice là lớp cha của 3 loại thiết bị. Nhưng bản thân nó
+  cũng có thể là "con" của một thứ khác. Ở đây có 2 tầng, mỗi tầng phục vụ một
+  bên khác nhau:
+
+  IIdentifiable          ← "hợp đồng": có id   (Repository cần)
+       ▲
+  TeachingDevice         ← "thiết bị": mượn, trả, sẵn sàng?  (AllocationService
+  cần)
+       ▲
+  ProjectorRemote, AirConditionerRemote, WirelessMicrophone
+
+  Lý do chính: để Repository không phụ thuộc vào thiết bị
+
+  InMemoryRepository chỉ cần một điều duy nhất ở phần tử nó lưu: phần tử đó có
+  id, để tìm kiếm và chặn trùng mã. Nó không quan tâm tới chuyện mượn trả hay
+  pin.
+
+  - Nếu khai báo T bound=TeachingDevice, repository bị trói vào thiết bị. Mai
+    mốt muốn lưu Lecturer, Room hay BorrowRecord thì không dùng lại được.
+  - Khai báo T bound=IIdentifiable thì bất kỳ lớp nào có id đều lưu được. Ví dụ:
+  class Lecturer(IIdentifiable): ...
+  lecturer_repo = InMemoryRepository[Lecturer]()   # dùng lại, không viết thêm
+  dòng nào
+
+  Đề bài cũng ghi đúng ý này: "Interface này cho phép các cấu trúc tổng quát tìm
+  đối tượng theo mã mà không phụ thuộc vào lớp cụ thể." Câu hỏi 2.2.5 và 4.4.1
+  trong đề cũng xoay quanh chuyện này.
+
+  Mỗi bên chỉ cần biết đúng phần của mình
+
+  ┌───────────────────────┬────────────────┬──────────────────────────────┐
+  │      Lớp sử dụng      │   Ràng buộc    │       Thứ nó dùng tới        │
+  ├───────────────────────┼────────────────┼──────────────────────────────┤
+  │ InMemoryRepository[T] │ IIdentifiable  │ chỉ .id                      │
+  ├───────────────────────┼────────────────┼──────────────────────────────┤
+  │ AllocationService[D]  │ TeachingDevice │ is_ready_for_use(), borrow() │
+  └───────────────────────┴────────────────┴──────────────────────────────┘
+
+  Đây là nguyên tắc phụ thuộc vào abstraction nhỏ nhất đủ dùng (Interface
+  Segregation).
+
+  Còn trong Python thì sao?
+
+  Python theo kiểu duck typing: không kế thừa mà có thuộc tính .id thì code vẫn
+  chạy. Kế thừa IIdentifiable vẫn đáng làm vì 3 lý do:
+  1. Nó nói rõ ý đồ thiết kế, và khớp với mũi tên trong UML của bạn.
+  2. ABC bắt buộc lớp con phải có id, quên thì báo lỗi ngay lúc tạo đối tượng.
+  3. Công cụ kiểm tra kiểu (Pylance, mypy) dựa vào bound=IIdentifiable để cảnh
+     báo khi bạn bỏ vào repo một đối tượng không có id.
+
+> check bước 3
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bước 3 đúng hết. Mình test bằng một lớp con giả và cả 8 trường hợp đều qua:
+
+  ┌─────┬───────────────────────────────────┬───────────────────────────────┐
+  │  #  │            Trường hợp             │            Kết quả            │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 1   │ TeachingDevice(...) trực tiếp     │ TypeError ✅                  │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 2   │ id rỗng, name toàn khoảng trắng,  │ ValueError ✅                 │
+  │     │ location None                     │                               │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 3   │ borrow() khi sẵn sàng             │ chuyển sang BORROWED ✅       │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 4   │ borrow() lần 2                    │ DeviceNotReadyException ✅    │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 5   │ return_device()                   │ về AVAILABLE ✅               │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 6   │ return_device() khi chưa mượn     │ lỗi ✅                        │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 7   │ borrow() khi lớp con báo chưa sẵn │ lỗi mang đúng device_id và    │
+  │     │  sàng                             │ status ✅                     │
+  ├─────┼───────────────────────────────────┼───────────────────────────────┤
+  │ 8   │ d.status = ... từ bên ngoài       │ AttributeError, đúng là chỉ   │
+  │     │                                   │ đọc ✅                        │
+  └─────┴───────────────────────────────────┴───────────────────────────────┘
+
+  Điểm tốt là borrow() gọi self.is_ready_for_use() chứ không tự kiểm tra status,
+  nên đa hình hoạt động đúng.
+
+  Có 3 góp ý nhỏ, không bắt buộc:
+
+  1. Thông báo lỗi không nói trường nào sai. Hiện tại id, name hay location sai
+  đều ra cùng một câu. Có thể sửa như sau:
+  for field, value in (("device_id", device_id), ("name", name),
+  ("storage_location", storage_location)):
+      if not isinstance(value, str) or not value.strip():
+          raise ValueError(f"{field} không được rỗng")
+
+  2. Vẫn thiếu type hint, giống bước 1 và 2. Ví dụ device_id: str, -> bool, ->
+  float, -> DeviceStatus. Nên thêm cho khớp UML.
+
+  3. Lỗi khi trả thiết bị dùng chung lớp DeviceManagementError. Như vậy vẫn chạy
+  được. Nếu muốn bên gọi bắt lỗi chính xác hơn thì tạo riêng class
+  InvalidDeviceStateError(DeviceManagementError). Cách này tùy bạn.
+
+  Ngoài ra, dòng 115–116 thừa dòng trống và khoảng trắng, nên xóa đi.
+
+  Bạn làm tiếp bước 4 (3 lớp con) được rồi.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\models.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> check it
+
+  Read 1 file (ctrl+o to expand)
+
+● Mình chưa thấy code mới trong file. models.py trên đĩa vẫn kết thúc ở __repr__
+  của TeachingDevice (dòng 114), chưa có ProjectorRemote, AirConditionerRemote
+  hay WirelessMicrophone.
+
+  Có thể bạn chưa lưu file. Hãy bấm Ctrl+S, hoặc bật File → Auto Save để khỏi bị
+  lại lần sau, rồi nhắn "check it" lần nữa nhé.
+
+> tôi đã sửa lại phần thông báo lỗi
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+● Chạy đúng rồi. Giờ thông báo lỗi đã chỉ rõ trường nào sai:
+
+  device_id không được rỗng
+  name không được rỗng
+  storage_location không được rỗng
+
+  Chỉ còn một lỗi trình bày ở models.py:68 (models.py#L68): dòng raise đang thụt
+  13 khoảng trắng, thiếu 3 so với chuẩn. Python không báo lỗi vì trong cùng
+  khối thụt bao nhiêu cũng được, miễn là nhất quán. Bạn nên sửa lại cho đủ 16
+  khoảng trắng (4 cấp, mỗi cấp 4) cho đúng PEP 8:
+
+              if not isinstance(value, str) or not value.strip():
+                  raise ValueError(f"{field} không được rỗng")
+
+  Dòng 66 hơi dài (hơn 100 ký tự). Nếu muốn có thể xuống dòng như sau:
+          fields = (("device_id", device_id), ("name", name),
+                    ("storage_location", storage_location))
+          for field, value in fields:
+
+  Bạn làm tiếp bước 4 được rồi, nhớ Ctrl+S trước khi nhờ mình check.
+
+> các bước còn thiếu là gì
+
+● Bạn đã xong bước 1–3. Còn lại các bước sau:
+
+  models.py
+
+  Bước: 4
+  Nội dung: _validate_percent + 3 lớp con: ProjectorRemote, AirConditionerRemote
+
+  (có is_compatible_with, get_priority_score_for_room), WirelessMicrophone
+  Tự kiểm tra: Pin 15 thì máy chiếu chưa sẵn sàng; micro (70, 50) có điểm 60.0
+  ────────────────────────────────────────
+  Bước: 5
+  Nội dung: T = TypeVar(..., bound=IIdentifiable), IRepository,
+  InMemoryRepository (add, remove, find_by_id, get_all, find_all)
+  Tự kiểm tra: Thêm trùng id thì ra DuplicateIdException; tìm id không có thì ra
+
+  None
+  ────────────────────────────────────────
+  Bước: 6
+  Nội dung: ISelectionStrategy, HighestPriorityStrategy, FirstAvailableStrategy
+  Tự kiểm tra: Danh sách rỗng thì ra NoSuitableItemException
+  ────────────────────────────────────────
+  Bước: 7
+  Nội dung: D = TypeVar(..., bound=TeachingDevice), AllocationService (strategy,
+
+  change_strategy, find_candidates, allocate, return_device)
+  Tự kiểm tra: Không có isinstance nào
+
+  main.py
+
+  ┌──────┬───────────────────────────────────────────────────────────────────┐
+  │ Bước │                             Nội dung                              │
+  ├──────┼───────────────────────────────────────────────────────────────────┤
+  │ 8    │ Dữ liệu mẫu: 3 máy chiếu, 2 điều hòa, 3 micro, 3 repo             │
+  ├──────┼───────────────────────────────────────────────────────────────────┤
+  │ 9    │ 11 test theo mục 9 của đề                                         │
+  ├──────┼───────────────────────────────────────────────────────────────────┤
+  │ 10   │ (bonus) InteractiveDisplayRemote viết trong main.py, chứng minh   │
+  │      │ mở rộng được mà không sửa models.py                               │
+  └──────┴───────────────────────────────────────────────────────────────────┘
+
+  Phần hoàn thiện còn treo từ bước 1–3:
+  - Thêm type hint vào exception, IIdentifiable và TeachingDevice.
+  - Sửa thụt lề ở models.py:68 (models.py#L68).
+  - Xóa dòng trống và khoảng trắng thừa ở cuối file.
+
+  Sản phẩm thiết kế bắt buộc (mục 2.1 của đề): bạn đã có ảnh UML. Còn phải viết
+  phần trả lời cho các câu hỏi 2.2, 4.4, chỉ ra 2 chỗ dùng đa hình, giải thích ý
+  nghĩa tham số kiểu của generic, và nêu 1 trade-off. Phần này nộp dưới dạng
+  tài liệu hay comment là tùy yêu cầu của giảng viên.
+
+> check bước 4 và tô có sửa thêm phần báo lỗi khi hiện thi trạng thái thiết bị
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Phần logic của bước 4 đúng hết. Kết quả test với dữ liệu mẫu:
+
+  ┌─────────────────────────┬───────────────────┬────────────────┬─────────┐
+  │        Thiết bị         │     Sẵn sàng      │      Điểm      │  Đúng   │
+  │                         │                   │                │  không  │
+  ├─────────────────────────┼───────────────────┼────────────────┼─────────┤
+  │ PR01 (pin 85) / PR02    │                   │                │         │
+  │ (pin 15) / PR03 (pin    │ ✅ / ❌ / ✅      │ 85 / 15 / 60   │ ✅      │
+  │ 60)                     │                   │                │         │
+  ├─────────────────────────┼───────────────────┼────────────────┼─────────┤
+  │ AC01 với A201 / A203    │ tương thích: True │ điểm theo      │ ✅      │
+  │                         │  / False          │ phòng: 100 / 0 │         │
+  ├─────────────────────────┼───────────────────┼────────────────┼─────────┤
+  │ MI01 (25, 90) / MI02    │                   │ 57.5 / 60 /    │         │
+  │ (70, 50) / MI03 (95,    │ ❌ / ✅ / ✅      │ 87.5           │ ✅      │
+  │ 80)                     │                   │                │         │
+  ├─────────────────────────┼───────────────────┼────────────────┼─────────┤
+  │ MI04 (90, tín hiệu 30)  │ ❌ (tín hiệu <    │ 60             │ ✅      │
+  │                         │ 40)               │                │         │
+  ├─────────────────────────┼───────────────────┼────────────────┼─────────┤
+  │ Pin 101 hoặc -1         │ ValueError        │                │ ✅      │
+  └─────────────────────────┴───────────────────┴────────────────┴─────────┘
+
+  Có 1 vấn đề thiết kế cần sửa và vài chỗ nhỏ.
+
+  ---
+
+  ⚠️ 1. Thông báo lỗi bạn vừa sửa: lớp cha đang "biết" chi tiết của lớp con
+
+  message = f"... chưa sẵn sàng (pin hoặc tín hiệu không đủ)"
+
+  Câu này nằm trong exception chung, nên nó sai trong 2 trường hợp:
+  - Với máy chiếu, câu chữ không đúng: máy chiếu không có tín hiệu.
+  - Nếu sau này thêm InteractiveDisplayRemote và nó chưa sẵn sàng vì lý do khác
+    (ví dụ chưa ghép nối), thông báo vẫn nói "pin hoặc tín hiệu". Muốn đúng thì
+    phải sửa exception. Như vậy là đi ngược yêu cầu "thêm loại mới mà không sửa
+    lớp cũ".
+
+  Cách sửa đúng tinh thần đa hình: để mỗi lớp con tự giải thích vì sao nó chưa
+  sẵn sàng.
+
+  # TeachingDevice
+  def get_not_ready_reason(self) -> str:
+      if self.status != DeviceStatus.AVAILABLE:
+          return f"trạng thái hiện tại: {self.status.name}"
+      return "không đạt điều kiện sẵn sàng"        # mặc định cho mọi loại
+
+  def borrow(self):
+      if not self.is_ready_for_use():
+          raise DeviceNotReadyException(self.id, self.status,
+  self.get_not_ready_reason())
+      ...
+  # ProjectorRemote: override
+  def get_not_ready_reason(self) -> str:
+      if self.status == DeviceStatus.AVAILABLE and self._battery_level < 20:
+          return f"pin {self._battery_level}% < 20%"
+      return super().get_not_ready_reason()
+  - WirelessMicrophone làm tương tự, kiểm tra cả pin và tín hiệu.
+  - DeviceNotReadyException nhận thêm tham số reason và chỉ ghép chuỗi, không tự
+    đoán nguyên nhân nữa.
+
+  Khi đó bạn có thêm một chỗ thứ 3 dùng đa hình để đưa vào báo cáo.
+
+  Nếu thấy cách trên phức tạp, phương án tối thiểu là đổi câu thành chung chung,
+  ví dụ "chưa đạt điều kiện sẵn sàng của loại thiết bị", để không nhắc tới pin
+  hay tín hiệu.
+
+  2. _validate_percent chưa kiểm tra kiểu dữ liệu
+
+  - Truyền "50" hoặc None thì ra TypeError với thông báo khó hiểu.
+  - Truyền True thì được chấp nhận (pin = True), vì trong Python bool là con của
+    int.
+  - Thông báo lỗi không nói tên trường, nên không biết là pin hay tín hiệu sai.
+
+  def _validate_percent(value, field):
+      if isinstance(value, bool) or not isinstance(value, int):
+          raise TypeError(f"{field} phải là số nguyên")
+      if not 0 <= value <= 100:
+          raise ValueError(f"{field} = {value} phải nằm trong [0, 100]")
+      return value
+
+  3. Điểm mặc định của AirConditionerRemote là 50
+
+  Đề ghi "100 nếu tương thích, ngược lại 0". Khi chưa biết phòng nào thì con số
+  50 là quy ước của riêng bạn. Chọn vậy không sai, nhưng phải ghi lý do vào phần
+  trade-off. Một lựa chọn dễ bảo vệ hơn là 100 if self._compatible_rooms else
+  0, tức là có phòng tương thích nào thì 100.
+
+  4. Mấy chỗ nhỏ
+
+  - ProjectorRemote.get_default_priority_score đang trả về int, trong khi đề yêu
+    cầu double. Nên đổi thành float(self._battery_level).
+  - Thụt lề: models.py:31 (models.py#L31) mới có 5 khoảng trắng, cần 8.
+  - Dòng 27, 29 và 186 chứa khoảng trắng thừa. Giữa dòng 13 và 14 thiếu 2 dòng
+    trống.
+  - Vẫn chưa có type hint.
+
+  Sửa xong mục 1 và 2 là bạn sang bước 5 (repository) được.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\models.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> check
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bạn đã sửa xong tất cả các góp ý lần trước. Kết quả test:
+
+  ┌────────────────────────────┬────────────────────────────────────────────┐
+  │          Kiểm tra          │                  Kết quả                   │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ PR02 (pin 15)              │ chưa sẵn sàng (pin 15% < 20%) ✅           │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ MI01 (pin 25)              │ chưa sẵn sàng (pin 25% < 30%) ✅           │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ MI04 (tín hiệu 30)         │ chưa sẵn sàng (tín hiệu 30% < 40%) ✅      │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ PR01 đã mượn rồi mượn tiếp │ chưa sẵn sàng (trạng thái hiện tại:        │
+  │                            │ BORROWED) ✅                               │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ "50", True, None, 50.5     │ TypeError battery_level phải là số nguyên  │
+  │                            │ ✅                                         │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ 101                        │ ValueError ✅                              │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ Điểm AC có phòng / không   │ 100.0 / 0.0 ✅                             │
+  │ phòng                      │                                            │
+  ├────────────────────────────┼────────────────────────────────────────────┤
+  │ Điểm máy chiếu             │ kiểu float ✅                              │
+  └────────────────────────────┴────────────────────────────────────────────┘
+
+  get_not_ready_reason dùng super() để quay về lý do chung, và exception không
+  còn biết gì về pin hay tín hiệu. Thiết kế này rất tốt.
+
+  Còn 1 bẫy nhỏ cần sửa:
+
+  AirConditionerRemote nhận một chuỗi thay vì tập phòng
+
+  AirConditionerRemote("X", "x", "x", "A203").compatible_rooms
+  # → frozenset({'0', 'A', '2', '3'})   ← chuỗi bị tách thành từng ký tự!
+  Lỗi này dễ gặp khi chỉ có một phòng và bạn quên bọc nó trong {}. Truyền None
+  vào thì cũng ra thông báo khó hiểu. Gợi ý sửa:
+  if isinstance(compatible_rooms, str) or compatible_rooms is None:
+      raise TypeError("compatible_rooms phải là tập/danh sách mã phòng, ví dụ
+  {'A203'}")
+  Ngoài ra có thể kiểm tra thêm mỗi phòng phải là chuỗi không rỗng. Phần này
+  không bắt buộc.
+
+  Chi tiết nhỏ (không bắt buộc)
+
+  - Micro hết cả pin lẫn tín hiệu (MI05: 10, 10) thì chỉ báo lỗi pin. Nếu muốn
+    báo cả hai, gom các lý do vào một list rồi ", ".join(...).
+  - models.py:65 (models.py#L65) dài hơn 100 ký tự.
+
+  Sửa xong mục đầu là bạn sang bước 5 (IRepository và InMemoryRepository) được.
+
+> check xem phần bẫy nhỏ kia ok chưa
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Phần bẫy chính đã ổn:
+
+  ┌───────────────────────────────┬────────────────────────┐
+  │            Đầu vào            │        Kết quả         │
+  ├───────────────────────────────┼────────────────────────┤
+  │ "A203" (chuỗi trần)           │ TypeError kèm gợi ý ✅ │
+  ├───────────────────────────────┼────────────────────────┤
+  │ None                          │ TypeError ✅           │
+  ├───────────────────────────────┼────────────────────────┤
+  │ ["A201","A202"], {"A203"}, () │ chạy đúng ✅           │
+  ├───────────────────────────────┼────────────────────────┤
+  │ ["A201", ""], ["A201", 5]     │ ValueError ✅          │
+  └───────────────────────────────┴────────────────────────┘
+
+  Nhưng còn 1 lỗi ẩn do thứ tự code: bạn duyệt compatible_rooms ở dòng 156, rồi
+  duyệt lại lần nữa khi gọi frozenset(...) ở dòng 159. Nếu đầu vào là generator,
+  nó chỉ đọc được một lần:
+
+  rooms = (r for r in ["A201", "A202"])
+  AirConditionerRemote("X", "x", "x", rooms).compatible_rooms
+  # → frozenset()   ← mất hết phòng, mà không báo lỗi gì
+
+  Kiểu khai báo Iterable[str] cho phép truyền generator, nên trường hợp này hoàn
+  toàn có thể xảy ra. Cách sửa là chuyển sang frozenset trước, rồi mới kiểm
+  tra:
+
+  rooms = frozenset(compatible_rooms)
+  for room in rooms:
+      ...
+  self._compatible_rooms = rooms
+
+  Thêm 2 chi tiết nhỏ, không bắt buộc:
+  - Truyền số 5 vào thì ra 'int' object is not iterable. Có thể dùng try/except
+    TypeError quanh frozenset(...) để báo lỗi rõ hơn.
+  - Khi mã phòng có kiểu sai (ví dụ số 5), đúng ra nên báo TypeError. ValueError
+    chỉ nên dùng cho chuỗi rỗng. Hiện bạn đang gộp cả hai trường hợp vào
+    ValueError.
+
+  Sửa xong thứ tự frozenset là bước 4 hoàn chỉnh, bạn sang bước 5 được.
+
+> check
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bây giờ ổn hoàn toàn. Mình chạy lại tất cả trường hợp:
+
+  ┌─────────────────────────────┬───────────────────────────────────────────┐
+  │           Đầu vào           │                  Kết quả                  │
+  ├─────────────────────────────┼───────────────────────────────────────────┤
+  │ Generator (r for r in       │ ['A201', 'A202'], không còn mất phòng ✅  │
+  │ [...])                      │                                           │
+  ├─────────────────────────────┼───────────────────────────────────────────┤
+  │ "A203", None, 5             │ TypeError với cùng một thông báo dễ hiểu  │
+  │                             │ ✅                                        │
+  ├─────────────────────────────┼───────────────────────────────────────────┤
+  │ ["A201", 5]                 │ TypeError: Mã phòng 5 phải là chuỗi ✅    │
+  ├─────────────────────────────┼───────────────────────────────────────────┤
+  │ ["A201", ""]                │ ValueError: Mã phòng không được rỗng ✅   │
+  ├─────────────────────────────┼───────────────────────────────────────────┤
+  │ list, set, tuple rỗng       │ chạy đúng ✅                              │
+  └─────────────────────────────┴───────────────────────────────────────────┘
+
+  Còn 2 chỗ chỉ để code gọn hơn, không bắt buộc:
+  - Ở dòng 159, viết raise TypeError(...) from None. Khi đó traceback chỉ hiện
+    lỗi của bạn, không kèm theo lỗi gốc "During handling of the above
+    exception...".
+  - Câu thông báo ở dòng 155 và 159 giống hệt nhau. Có thể gộp lại thành một
+    điều kiện, hoặc tách ra một biến dùng chung.
+
+  Bước 4 xong. Bạn chuyển sang bước 5: T = TypeVar("T", bound=IIdentifiable),
+  IRepository và InMemoryRepository.
+
+> Bước 5 là gì
+
+● Bước 5 là viết kho lưu trữ generic, nằm ở mục 4 của đề và ô IRepository[T] /
+  InMemoryRepository[T] trong UML. Đây là một lớp kho duy nhất nhưng dùng được
+  cho mọi loại thiết bị.
+
+  1. Khai báo tham số kiểu
+
+  T = TypeVar("T", bound=IIdentifiable)
+  - T là chỗ trống cho kiểu phần tử: lúc dùng có thể là ProjectorRemote,
+    WirelessMicrophone, v.v.
+  - bound=IIdentifiable nghĩa là T phải là lớp có id. Nhờ vậy, bên trong repo
+    bạn được phép gọi item.id một cách an toàn.
+
+  2. Interface IRepository(ABC, Generic[T])
+
+  Gồm 5 hàm abstract, chỉ khai báo chữ ký và chưa có thân:
+
+  ┌────────────┬────────────────────────────────┬───────────────┐
+  │    Hàm     │            Tham số             │    Trả về     │
+  ├────────────┼────────────────────────────────┼───────────────┤
+  │ add        │ item: T                        │ None          │
+  ├────────────┼────────────────────────────────┼───────────────┤
+  │ remove     │ item_id: str                   │ bool          │
+  ├────────────┼────────────────────────────────┼───────────────┤
+  │ find_by_id │ item_id: str                   │ Optional[T]   │
+  ├────────────┼────────────────────────────────┼───────────────┤
+  │ get_all    │ không có                       │ tuple[T, ...] │
+  ├────────────┼────────────────────────────────┼───────────────┤
+  │ find_all   │ condition: Callable[[T], bool] │ tuple[T, ...] │
+  └────────────┴────────────────────────────────┴───────────────┘
+
+  3. Lớp cài đặt InMemoryRepository(IRepository[T])
+
+  Dữ liệu được lưu trong self._items: dict[str, T] = {}, với key là id và value
+  là đối tượng.
+
+  ┌────────────┬─────────────────────────────────────────────────────────────┐
+  │    Hàm     │                  Quy tắc (mục 4.3 của đề)                   │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ add        │ item is None thì ValueError. Id đã có thì                   │
+  │            │ DuplicateIdException(item.id). Còn lại thì lưu vào dict     │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ remove     │ Có thì xóa và trả về True. Không có thì trả về False, không │
+  │            │  raise lỗi                                                  │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ find_by_id │ Không có thì trả về None. Gợi ý: dict.get()                 │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ get_all    │ Trả về tuple(...), không trả về self._items hay một list    │
+  ├────────────┼─────────────────────────────────────────────────────────────┤
+  │ find_all   │ Trả về tuple các phần tử mà condition(x) là True. Nên kiểm  │
+  │            │ tra condition khác None                                     │
+  └────────────┴─────────────────────────────────────────────────────────────┘
+
+  Có 2 điểm cần hiểu:
+  - Vì sao get_all trả về tuple? Nếu trả về list hay dict nội bộ, bên ngoài gọi
+    .append() hay .clear() sẽ phá hỏng kho mà không qua kiểm tra trùng id. Tuple
+    thì không sửa được.
+  - Vì sao dùng dict? Tìm và kiểm tra trùng id chỉ mất O(1). dict cũng giữ thứ
+    tự thêm vào, nên FirstAvailableStrategy ở bước 6 vẫn có khái niệm "phần tử
+    đầu tiên". Đây là phần trade-off cho câu hỏi 4.4.3.
+
+  4. Tự kiểm tra
+
+  from models import *
+  r = InMemoryRepository()
+  r.add(ProjectorRemote("P1", "R1", "A", 80))
+  r.add(ProjectorRemote("P2", "R2", "A", 10))
+  r.add(ProjectorRemote("P1", "R3", "A", 50))      # DuplicateIdException
+  r.add(None)                                      # ValueError
+  print(r.find_by_id("P1"), r.find_by_id("X"))     # ProjectorRemote(P1...) None
+  print(r.find_all(lambda d: d.is_ready_for_use()))  # chỉ có P1
+  print(r.remove("X"), r.remove("P2"))             # False True
+  t = r.get_all(); print(type(t).__name__)         # tuple
+
+  Câu hỏi 4.4.4 trong đề hỏi vì sao không viết 3 lớp repo riêng. Câu trả lời
+  chính là bước này: một InMemoryRepository dùng được cho cả 3 loại thiết bị mà
+  không phải chép lại code.
+
+> check
+
+  Searched for 1 pattern, read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bước 5 đúng hết. Mình test và tất cả đều qua:
+
+  ┌────────────────────────────┬─────────────────────────────────────────────┐
+  │          Kiểm tra          │                   Kết quả                   │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ Thêm trùng id P1           │ DuplicateIdException: ID bị trùng: 'P1' ✅  │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ add(None)                  │ ValueError ✅                               │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ find_by_id có / không có   │ trả về đối tượng / None ✅                  │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ find_all(is_ready_for_use) │ chỉ có P1 (P2 pin 10 bị loại) ✅            │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ find_all(None)             │ ValueError ✅                               │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ remove("X") / remove("P2") │ False / True ✅                             │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ get_all()                  │ tuple, bên ngoài gọi .append thì bị chặn ✅ │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ Thứ tự phần tử             │ giữ đúng thứ tự thêm vào (P1, rồi P0) ✅    │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ Cùng lớp đó dùng cho micro │ chạy được ✅                                │
+  ├────────────────────────────┼─────────────────────────────────────────────┤
+  │ IRepository()              │ TypeError, đúng là lớp abstract ✅          │
+  └────────────────────────────┴─────────────────────────────────────────────┘
+
+  Có 2 góp ý nhỏ:
+
+  1. Thông báo lỗi đang nói về "thiết bị", trong khi repo là generic.
+  InMemoryRepository không biết mình đang lưu thiết bị: nó có thể lưu Lecturer
+  hay Room. Nên đổi "Thiết bị không được rỗng" thành "Phần tử không được rỗng".
+  Đây đúng là ý của câu hỏi 2.2.3: "Kho có cần biết thiết bị cụ thể không?", và
+  câu trả lời là không, kể cả trong câu thông báo lỗi.
+
+  2. bound=IIdentifiable không được kiểm tra khi chạy.
+  r.add("abc")   # AttributeError: 'str' object has no attribute 'id'
+  Python chỉ dùng TypeVar(bound=...) cho công cụ kiểm tra kiểu như Pylance hay
+  mypy. Lúc chạy, nó không chặn gì cả. Đây là khác biệt lớn so với where T :
+  IIdentifiable của C#. Nếu muốn chặn ngay lúc chạy, có thể thêm:
+  if not isinstance(item, IIdentifiable):
+      raise TypeError("Phần tử phải cài đặt IIdentifiable")
+  Việc này không bắt buộc, nhưng đáng ghi vào báo cáo như một điểm khác biệt
+  giữa generic của Python và C#.
+
+  Bạn chuyển sang bước 6 được rồi: ISelectionStrategy, HighestPriorityStrategy
+  và FirstAvailableStrategy.
+
+> nói lại bước 6
+
+● Bước 6 là viết chiến lược lựa chọn, ứng với mục 5 của đề và nhánh
+  ISelectionStrategy[T] bên phải trong UML. Mỗi chiến lược là một cách chọn ra 1
+  phần tử từ danh sách ứng viên. Muốn có cách chọn mới thì viết thêm lớp mới,
+  không cần sửa code cũ.
+
+  1. Tham số kiểu
+
+  S = TypeVar("S")    # không có bound
+  Chiến lược không cần biết phần tử có id hay là thiết bị. Nó chỉ chọn trong một
+  danh sách, nên dùng được cho mọi kiểu. Đây là ý của câu hỏi 2.2.6: không phải
+  generic nào cũng cần ràng buộc.
+
+  Trong UML vẫn ghi là T. Bạn đặt tên S để không đụng với T đã có
+  bound=IIdentifiable ở bước 5.
+
+  2. Interface ISelectionStrategy(ABC, Generic[S])
+
+  Chỉ có 1 hàm abstract:
+
+  ┌────────┬─────────────────────────┬────────┐
+  │  Hàm   │         Tham số         │ Trả về │
+  ├────────┼─────────────────────────┼────────┤
+  │ select │ candidates: Sequence[S] │ S      │
+  └────────┴─────────────────────────┴────────┘
+
+  3. Hai lớp cài đặt
+
+  FirstAvailableStrategy(ISelectionStrategy[S])
+  - Danh sách rỗng thì raise NoSuitableItemException().
+  - Ngược lại trả về candidates[0].
+
+  HighestPriorityStrategy(ISelectionStrategy[S])
+  - __init__(self, score_selector: Callable[[S], float]): lưu hàm tính điểm vào
+    self._score_selector. Nếu nó là None thì ValueError.
+  - select: danh sách rỗng thì NoSuitableItemException, ngược lại
+    max(candidates, key=self._score_selector).
+
+  Có 3 điểm cần hiểu:
+  - Vì sao truyền hàm tính điểm từ ngoài vào? Như vậy cùng một lớp có thể chọn
+    theo nhiều tiêu chí: điểm mặc định, điểm theo phòng
+    (get_priority_score_for_room("A203")), chỉ theo pin, v.v. Chiến lược không
+    cần biết điểm được tính ra sao.
+  - Vì sao dùng max chứ không dùng sort? Đề yêu cầu "chiến lược không thay đổi
+    danh sách đầu vào". max chỉ đọc danh sách, còn candidates.sort() thì sửa nó.
+    sorted() không sửa danh sách nhưng thừa, vì tốn O(n log n) so với O(n).
+  - Hai phần tử bằng điểm nhau thì sao? max trả về phần tử đầu tiên đạt điểm cao
+    nhất. Nên biết điều này để giải thích kết quả test.
+
+  4. Đây là chỗ dùng đa hình (2) trong UML
+
+  Ở bước 7, AllocationService chỉ gọi self._strategy.select(...) mà không biết
+  đó là chiến lược nào. Gọi change_strategy() lúc chạy thì kết quả đổi theo. Đó
+  chính là Strategy pattern, và là câu trả lời cho câu hỏi 2.2.4: dùng interface
+  thay vì chuỗi if/else.
+
+  5. Tự kiểm tra
+
+  from models import *
+  print(FirstAvailableStrategy().select([3, 9, 5]))                  # 3
+  print(HighestPriorityStrategy(lambda x: x).select([3, 9, 5]))      # 9
+  print(HighestPriorityStrategy(lambda s: len(s)).select(["a", "abc", "ab"]))  #
+  abc → generic, không chỉ thiết bị
+
+  data = [3, 9, 5]; HighestPriorityStrategy(lambda x: x).select(data);
+  print(data)  # [3, 9, 5] không đổi
+
+  FirstAvailableStrategy().select([])                                #
+  NoSuitableItemException
+  HighestPriorityStrategy(None)                                      #
+  ValueError
+
+  mics = [WirelessMicrophone("M1","M","C",70,50),
+  WirelessMicrophone("M2","M","C",95,80)]
+  print(HighestPriorityStrategy(lambda d:
+  d.get_default_priority_score()).select(mics))  # M2
+
+> check
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bước 6 đúng hết:
+
+  ┌─────────────────────────────────────┬────────────────────────────────────┐
+  │              Kiểm tra               │              Kết quả               │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ FirstAvailableStrategy với [3, 9,   │ 3 ✅                               │
+  │ 5]                                  │                                    │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ HighestPriorityStrategy với [3, 9,  │ 9 ✅                               │
+  │ 5]                                  │                                    │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ Chọn chuỗi dài nhất (không phải     │ abc, nên generic chạy được với     │
+  │ thiết bị)                           │ kiểu bất kỳ ✅                     │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ Danh sách đầu vào sau khi chọn      │ vẫn là [3, 9, 5], không bị sửa ✅  │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ Hai phần tử bằng điểm               │ lấy phần tử đầu tiên ('a', 5) ✅   │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ Danh sách rỗng, với cả 2 chiến lược │ NoSuitableItemException ✅         │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ HighestPriorityStrategy(None)       │ ValueError ✅                      │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ ISelectionStrategy()                │ TypeError, đúng là lớp abstract ✅ │
+  ├─────────────────────────────────────┼────────────────────────────────────┤
+  │ Chọn micro theo điểm mặc định       │ M2 (87.5) ✅                       │
+  └─────────────────────────────────────┴────────────────────────────────────┘
+
+  Có 2 góp ý nhỏ, không bắt buộc:
+
+  1. select(None) hiện cho ra NoSuitableItemException. Lý do là not None cũng
+  bằng True, nên nó rơi vào nhánh danh sách rỗng. Hai trường hợp này về bản chất
+  khác nhau:
+  - Danh sách rỗng là tình huống nghiệp vụ: không có thiết bị nào phù hợp.
+  - None là lỗi lập trình: gọi hàm sai cách.
+
+  Nếu muốn phân biệt, thêm vào đầu select:
+  if candidates is None:
+      raise ValueError("candidates không được None")
+
+  2. Câu thông báo mặc định của NoSuitableItemException là "Không tìm thấy thiết
+  bị phù hợp". Strategy là generic, có thể chọn cả chuỗi hay số, nên câu này
+  hơi lệch. Có thể đổi thành "Không có ứng viên phù hợp". Thông báo "Thiết bị
+  không được rỗng" trong InMemoryRepository.add ở bước 5 cũng vẫn chưa sửa.
+
+  Bạn chuyển sang bước 7 (AllocationService) được rồi. Đây là bước cuối của
+  models.py, nơi ráp repository và strategy lại với nhau.
+
+> bước 7
+
+● Bước 7 là viết AllocationService, ứng với mục 6 của đề và ô xanh lá ở giữa
+  UML. Đây là lớp ráp repository và strategy lại để cấp phát thiết bị. Nó chỉ
+  làm việc qua 2 interface IRepository và ISelectionStrategy, nên không biết
+  repo hay chiến lược cụ thể là gì.
+
+  1. Tham số kiểu
+
+  D = TypeVar("D", bound=TeachingDevice)
+  Ở đây bound là TeachingDevice chứ không phải IIdentifiable, vì service cần gọi
+  is_ready_for_use(), borrow() và return_device(). Những hàm này chỉ thiết bị
+  mới có.
+
+  Như vậy mỗi tầng chỉ đòi đúng thứ nó dùng:
+
+  ┌───────────────────────┬────────────────┬─────────────────────────────────┐
+  │          Lớp          │   Ràng buộc    │              Lý do              │
+  ├───────────────────────┼────────────────┼─────────────────────────────────┤
+  │ InMemoryRepository[T] │ IIdentifiable  │ chỉ cần .id                     │
+  ├───────────────────────┼────────────────┼─────────────────────────────────┤
+  │ ISelectionStrategy[S] │ không có       │ chỉ chọn trong danh sách        │
+  ├───────────────────────┼────────────────┼─────────────────────────────────┤
+  │ AllocationService[D]  │ TeachingDevice │ cần mượn, trả, kiểm tra sẵn     │
+  │                       │                │ sàng                            │
+  └───────────────────────┴────────────────┴─────────────────────────────────┘
+
+  2. Các thành phần (theo UML)
+
+  ┌─────────────────────────────────┬────────────────────────────────────────┐
+  │           Thành phần            │              Việc cần làm              │
+  ├─────────────────────────────────┼────────────────────────────────────────┤
+  │                                 │ Một trong hai là None thì ValueError.  │
+  │ __init__(repository, strategy)  │ Lưu vào self._repository và            │
+  │                                 │ self._strategy                         │
+  ├─────────────────────────────────┼────────────────────────────────────────┤
+  │ strategy (property chỉ đọc)     │ Trả về self._strategy                  │
+  ├─────────────────────────────────┼────────────────────────────────────────┤
+  │ change_strategy(new_strategy)   │ None thì ValueError, còn không thì gán │
+  │                                 │  chiến lược mới                        │
+  ├─────────────────────────────────┼────────────────────────────────────────┤
+  │                                 │ Lấy từ repo các thiết bị               │
+  │ find_candidates(condition=None) │ is_ready_for_use() và thỏa condition   │
+  │                                 │ (nếu có). Trả về tuple                 │
+  ├─────────────────────────────────┼────────────────────────────────────────┤
+  │                                 │ find_candidates, rồi                   │
+  │ allocate(condition=None)        │ self._strategy.select(...), rồi        │
+  │                                 │ borrow(), cuối cùng trả về thiết bị    │
+  ├─────────────────────────────────┼────────────────────────────────────────┤
+  │                                 │ find_by_id. Nếu None thì raise lỗi (ví │
+  │ return_device(device_id)        │  dụ DeviceManagementError). Còn không  │
+  │                                 │ thì gọi device.return_device() rồi trả │
+  │                                 │  về thiết bị                           │
+  └─────────────────────────────────┴────────────────────────────────────────┘
+
+  Gợi ý cho find_candidates: chỉ gọi find_all một lần, với một lambda ghép cả 2
+  điều kiện:
+  lambda d: d.is_ready_for_use() and (condition is None or condition(d))
+
+  3. Những điểm cần nắm
+
+  - Không dùng isinstance hay chuỗi if/else theo loại thiết bị (mục 6.3 của đề).
+    Mọi khác biệt giữa các loại đã nằm trong is_ready_for_use() của từng lớp
+    con, và service chỉ gọi hàm đó.
+  - Hai chỗ đa hình đều xuất hiện ở đây:
+    a. d.is_ready_for_use(): chạy phiên bản của lớp con.
+    b. self._strategy.select(...): chạy chiến lược hiện tại.
+  - Không gọi select khi danh sách rỗng? Không cần tự kiểm tra, vì strategy đã
+    tự raise NoSuitableItemException. Cứ để lỗi đó đi ra ngoài.
+  - borrow() vẫn tự kiểm tra lại điều kiện sẵn sàng. Như vậy có 2 lớp bảo vệ, kể
+    cả khi ai đó viết một strategy chọn sai.
+
+  4. Tự kiểm tra
+
+  from models import *
+  repo = InMemoryRepository()
+  for d in [ProjectorRemote("PR01","R1","A",85),
+  ProjectorRemote("PR02","R2","A",15),
+            ProjectorRemote("PR03","R3","B",60)]:
+      repo.add(d)
+
+  svc = AllocationService(repo, HighestPriorityStrategy(lambda d:
+  d.get_default_priority_score()))
+  print(svc.find_candidates())                  # PR01, PR03 (PR02 pin 15 bị
+  loại)
+  s = svc.allocate(); print(s, s.status)        # PR01 BORROWED
+  print(svc.find_candidates())                  # chỉ còn PR03
+
+  svc.change_strategy(FirstAvailableStrategy())
+  print(svc.allocate())                         # PR03
+  svc.allocate()                                # NoSuitableItemException
+
+  print(svc.return_device("PR01"))              # PR01 AVAILABLE
+  svc.return_device("XXX")                      # lỗi: không tìm thấy
+  svc.return_device("PR01")                     # lỗi: chưa được mượn
+
+  ac = InMemoryRepository()
+  ac.add(AirConditionerRemote("AC01","A1","A",{"A201"}))
+  ac.add(AirConditionerRemote("AC02","A2","B",{"A203","B101"}))
+  acs = AllocationService(ac, FirstAvailableStrategy())
+  print(acs.allocate(lambda d: d.is_compatible_with("A203")))   # AC02
+
+  Xong bước này là models.py hoàn chỉnh. Sau đó chỉ còn main.py với 11 test.
+
+> check
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Bước 7 đúng hết:
+
+  ┌─────────────────────────────────────────┬───────────────────────────────┐
+  │                Kiểm tra                 │            Kết quả            │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ find_candidates()                       │ PR01 và PR03 (PR02 pin 15 bị  │
+  │                                         │ loại) ✅                      │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ allocate() với HighestPriority          │ PR01, chuyển sang BORROWED ✅ │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ Ứng viên sau khi mượn                   │ chỉ còn PR03 ✅               │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ change_strategy(FirstAvailable) rồi     │ PR03 ✅                       │
+  │ allocate                                │                               │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ Hết thiết bị                            │ NoSuitableItemException ✅    │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ return_device("PR01")                   │ về AVAILABLE ✅               │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ return_device("XXX") / trả 2 lần        │ lỗi rõ ràng ✅                │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ Truyền None vào constructor hoặc        │ ValueError ✅                 │
+  │ change_strategy                         │                               │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ svc.strategy = ...                      │ bị chặn, vì là property chỉ   │
+  │                                         │ đọc ✅                        │
+  ├─────────────────────────────────────────┼───────────────────────────────┤
+  │ Điều hòa, phòng A203 / Z999             │ AC02 /                        │
+  │                                         │ NoSuitableItemException ✅    │
+  └─────────────────────────────────────────┴───────────────────────────────┘
+
+  isinstance trong models.py chỉ xuất hiện ở 4 chỗ (dòng 66, 122, 154, 161), và
+  cả 4 đều là kiểm tra dữ liệu đầu vào. AllocationService không có chỗ nào rẽ
+  nhánh theo loại thiết bị, nên đạt yêu cầu mục 6.3 của đề.
+
+  Có một góp ý nhỏ, không bắt buộc. Lỗi "không tìm thấy mã" trong return_device
+  đang dùng lớp chung DeviceManagementError. Có thể tạo riêng
+  DeviceNotFoundException(DeviceManagementError) có property device_id, giống
+  cách bạn đã làm với DuplicateIdException. Khi đó bên gọi bắt lỗi được chính
+  xác hơn.
+
+  ---
+
+  models.py đã hoàn chỉnh. Phần sửa nhỏ còn treo từ trước (đều không bắt buộc):
+  - Đổi câu "Thiết bị không được rỗng" trong InMemoryRepository.add thành "Phần
+    tử ...".
+  - Phân biệt select(None) với danh sách rỗng.
+  - Thêm from None sau raise TypeError(...) ở dòng 159.
+
+  Tiếp theo là bước 8–9: main.py (dữ liệu mẫu và 11 test), rồi bước 10 (bonus
+  InteractiveDisplayRemote).
+
+> bước 8-9 đi
+
+● Bước 8–9 là viết main.py, ứng với mục 9 của đề: tạo dữ liệu mẫu rồi chạy 11
+  kịch bản kiểm thử. Mục tiêu là in kết quả ra màn hình để chứng minh từng yêu
+  cầu chạy đúng.
+
+  Bước 8: Khung file và dữ liệu mẫu
+
+  Cấu trúc file
+
+  from models import *          # hoặc import từng tên cho rõ ràng
+
+
+  def section(title: str) -> None:
+      print(f"\n=== {title} ===")
+
+
+  def main() -> None:
+      # 1) tạo thiết bị
+      # 2) tạo 3 repo
+      # 3) 11 test, mỗi test bắt đầu bằng section("...")
+      ...
+
+
+  if __name__ == "__main__":
+      main()
+
+  Dữ liệu mẫu
+
+  Mỗi bộ dữ liệu được chọn để kiểm được một trường hợp cụ thể:
+
+  ┌──────┬─────────┬───────────────────┬────────┬───────────────────────────┐
+  │  Mã  │  Loại   │     Thông số      │  Sẵn   │         Mục đích          │
+  │      │         │                   │  sàng  │                           │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ PR01 │ Máy     │ pin 85            │ ✅     │ điểm cao nhất             │
+  │      │ chiếu   │                   │        │                           │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ PR02 │ Máy     │ pin 15            │ ❌     │ bị loại vì pin < 20       │
+  │      │ chiếu   │                   │        │                           │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ PR03 │ Máy     │ pin 60            │ ✅     │                           │
+  │      │ chiếu   │                   │        │                           │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ AC01 │ Điều    │ {"A201","A202"}   │ ✅     │ không hợp phòng A203      │
+  │      │ hòa     │                   │        │                           │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ AC02 │ Điều    │ {"A203","B101"}   │ ✅     │ hợp phòng A203            │
+  │      │ hòa     │                   │        │                           │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ MI01 │ Micro   │ pin 25, tín hiệu  │ ❌     │ bị loại vì pin < 30, dù   │
+  │      │         │ 90                │        │ đứng đầu danh sách        │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ MI02 │ Micro   │ pin 70, tín hiệu  │ ✅     │ đứng đầu trong số sẵn     │
+  │      │         │ 50                │        │ sàng, điểm 60             │
+  ├──────┼─────────┼───────────────────┼────────┼───────────────────────────┤
+  │ MI03 │ Micro   │ pin 95, tín hiệu  │ ✅     │ điểm cao nhất, 87.5       │
+  │      │         │ 80                │        │                           │
+  └──────┴─────────┴───────────────────┴────────┴───────────────────────────┘
+
+  Thứ tự thêm vào repo rất quan trọng: MI01 rồi MI02 rồi MI03.
+  FirstAvailableStrategy dựa vào thứ tự này.
+
+  3 repo, cùng một lớp
+
+  projector_repo = InMemoryRepository[ProjectorRemote]()
+  ac_repo        = InMemoryRepository[AirConditionerRemote]()
+  mic_repo       = InMemoryRepository[WirelessMicrophone]()
+  Cách viết InMemoryRepository[ProjectorRemote]() chạy được bình thường. Nó giúp
+  Pylance biết repo này chỉ chứa máy chiếu.
+
+  ---
+
+  Bước 9: 11 test
+
+  ⚠️ Các test chạy nối tiếp và dùng chung đối tượng. Thiết bị đã mượn ở test
+  trước sẽ vẫn ở trạng thái BORROWED ở test sau. Bảng dưới tính sẵn chuyện đó,
+  nên bạn cần giữ đúng thứ tự.
+
+  #: 1
+  Cách làm: add cả 8 thiết bị, in len(repo.get_all()) và danh sách của từng repo
+  Kỳ vọng: 3 / 2 / 3
+  ────────────────────────────────────────
+  #: 2
+  Cách làm: try: projector_repo.add(ProjectorRemote("PR01", ...)), except
+  DuplicateIdException as e: in e.duplicate_id
+  Kỳ vọng: PR01; repo vẫn còn 3 thiết bị
+  ────────────────────────────────────────
+  #: 3
+  Cách làm: find_by_id("PR03") và find_by_id("XXX")
+  Kỳ vọng: tìm được PR03; "XXX" ra None
+  ────────────────────────────────────────
+  #: 4
+  Cách làm: find_all(lambda d: d.is_ready_for_use()) trên cả 3 repo
+  Kỳ vọng: PR01, PR03 · AC01, AC02 · MI02, MI03
+  ────────────────────────────────────────
+  #: 5
+  Cách làm: projector_service = AllocationService(projector_repo,
+  HighestPriorityStrategy(lambda d: d.get_default_priority_score())), rồi
+  allocate()
+  Kỳ vọng: PR01
+  ────────────────────────────────────────
+  #: 6
+  Cách làm: ac_service với FirstAvailableStrategy, allocate(lambda d:
+  d.is_compatible_with("A203"))
+  Kỳ vọng: AC02
+  ────────────────────────────────────────
+  #: 7
+  Cách làm: mic_service với FirstAvailableStrategy, allocate()
+  Kỳ vọng: MI02 (MI01 đứng đầu nhưng bị loại)
+  ────────────────────────────────────────
+  #: 8
+  Cách làm: Xem chi tiết bên dưới
+  Kỳ vọng: First chọn MI02, Highest chọn MI03
+  ────────────────────────────────────────
+  #: 9
+  Cách làm: ac_service.allocate(lambda d: d.is_compatible_with("Z999")) trong
+  try/except NoSuitableItemException
+  Kỳ vọng: bắt được exception
+  ────────────────────────────────────────
+  #: 10
+  Cách làm: Xem chi tiết bên dưới
+  Kỳ vọng: BORROWED, sau khi trả thì AVAILABLE
+  ────────────────────────────────────────
+  #: 11
+  Cách làm: Xem chi tiết bên dưới
+  Kỳ vọng: cả 3 repo đều là InMemoryRepository
+
+  Chi tiết test 8: đổi chiến lược lúc chạy
+
+  Để quan sát được sự khác biệt, hai chiến lược phải chọn trên cùng một tập ứng
+  viên:
+  1. mic_service.return_device("MI02"): trả MI02 từ test 7 về kho.
+  2. In mic_service.find_candidates(), kết quả là MI02 và MI03.
+  3. In type(mic_service.strategy).__name__ cùng kết quả
+     mic_service.strategy.select(candidates). Lúc này là FirstAvailable, chọn
+     MI02. Chưa mượn gì.
+  4. mic_service.change_strategy(HighestPriorityStrategy(lambda d:
+     d.get_default_priority_score()))
+  5. allocate() cho ra MI03.
+
+  Cùng service, cùng dữ liệu, chỉ đổi strategy là kết quả đổi theo. Đây là bằng
+  chứng cho đa hình lúc chạy.
+
+  Chi tiết test 10: chứng minh chuyển sang BORROWED
+
+  Dùng chính PR01 đã cấp phát ở test 5:
+  found = projector_repo.find_by_id("PR01")
+  print(found.status)                 # BORROWED
+  print(found is selected_projector)  # True: repo giữ cùng đối tượng, không
+  phải bản sao
+  projector_service.return_device("PR01")
+  print(found.status)                 # AVAILABLE
+  Nên thêm assert found.status == DeviceStatus.BORROWED. Nếu sai thì chương
+  trình dừng ngay, nên có assert là "chứng minh" thật sự, mạnh hơn chỉ in ra.
+
+  Chi tiết test 11: repo generic cho nhiều loại
+
+  for repo in (projector_repo, ac_repo, mic_repo):
+      print(type(repo).__name__, len(repo.get_all()), [type(d).__name__ for d in
+  repo.get_all()])
+  print(type(projector_repo) is type(mic_repo))   # True
+  Kết quả cho thấy cùng một lớp, chứa 3 loại thiết bị khác nhau, và không có lớp
+  ProjectorRemoteRepository nào. Đây là câu trả lời cho câu hỏi 4.4.4.
+
+  ---
+
+  Mẹo
+
+  - Đặt tên biến cho thiết bị được chọn, như selected_projector, selected_ac,
+    selected_mic, để các test sau dùng lại.
+  - Khi in, gọi repr (đã có __repr__) để thấy luôn trạng thái thiết bị.
+  - Test nào mong đợi lỗi (2 và 9) thì in thêm một dòng nếu không có lỗi xảy ra,
+    ví dụ print("SAI: lẽ ra phải lỗi"). Nếu không, bạn sẽ không phát hiện được
+    khi code hỏng.
+
+  Viết xong thì nhắn "check", mình sẽ chạy python main.py và đối chiếu với bảng
+  kỳ vọng.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\main.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> test tối thiểu trong file?
+
+● Theo mục 9 của đề, mức tối thiểu gồm:
+
+  Dữ liệu
+  - 3 điều khiển máy chiếu, mỗi cái một mức pin khác nhau.
+  - 2 điều khiển điều hòa, mỗi cái một tập phòng tương thích khác nhau.
+  - 3 micro, mỗi cái một mức pin và chất lượng tín hiệu khác nhau.
+
+  11 kịch bản kiểm thử (bắt buộc hết)
+  1. Thêm thiết bị vào repository
+  2. Thêm 2 thiết bị trùng mã
+  3. Tìm thiết bị theo mã
+  4. Lọc thiết bị sẵn sàng
+  5. Chọn máy chiếu có điểm cao nhất
+  6. Chọn điều hòa tương thích với một phòng
+  7. Chọn micro đầu tiên sẵn sàng
+  8. Đổi chiến lược lúc chạy và quan sát kết quả
+  9. Cấp phát khi không có ứng viên phù hợp
+  10. Chứng minh thiết bị được chọn chuyển sang Borrowed
+  11. Chứng minh repository generic dùng được cho ít nhất 2 loại thiết bị mà
+      không sao chép mã
+
+  Để gọn, bạn có thể:
+  - Mỗi test chỉ cần vài dòng. Không bắt buộc kiểm thật nhiều trường hợp phụ như
+    mình làm khi check code.
+  - Test 4 chỉ cần làm trên 1 repo, ví dụ máy chiếu. Test 11 chỉ cần 2 loại
+    thiết bị.
+  - Gộp test 10 vào ngay sau test 5: in status của PR01 vừa cấp phát. Vẫn nên in
+    tiêu đề riêng cho mục 10 để người chấm dễ thấy.
+  - Bước 10 (InteractiveDisplayRemote) là bonus, không bắt buộc. Nó chỉ giúp
+    chứng minh rõ hơn ý "thêm loại mới mà không sửa code cũ".
+
+  Mục 9 không bắt buộc dùng unittest hay pytest. Một file main.py in kết quả cho
+  từng mục là đủ.
+
+> thế bước 8 là gì v
+
+● Có 2 thứ cùng mang số 8 nên dễ nhầm:
+
+  Bước 8 trong kế hoạch của mình là chuẩn bị dữ liệu trong main.py, chưa phải
+  test. Gồm 3 việc:
+
+  1. Khung file: from models import *, hàm section(title) để in tiêu đề, hàm
+     main(), và if __name__ == "__main__": main() ở cuối.
+  2. Tạo 8 thiết bị:
+     - Máy chiếu PR01 (pin 85), PR02 (pin 15), PR03 (pin 60).
+     - Điều hòa AC01 {"A201","A202"}, AC02 {"A203","B101"}.
+     - Micro MI01 (25, 90), MI02 (70, 50), MI03 (95, 80).
+  3. Tạo 3 repo rỗng từ cùng lớp InMemoryRepository: projector_repo, ac_repo,
+     mic_repo.
+
+  Bước này chỉ tạo đối tượng, chưa add vào repo. Việc add là test số 1.
+
+  Test số 8 trong đề là "đổi chiến lược lúc chạy". Test này thuộc bước 9 (viết
+  11 test), không phải bước 8.
+
+  Tóm lại:
+
+  ┌──────┬────────────────────────────────────────────────────────────────┐
+  │ Bước │                            Nội dung                            │
+  ├──────┼────────────────────────────────────────────────────────────────┤
+  │ 8    │ Khung file, 8 thiết bị, 3 repo rỗng                            │
+  ├──────┼────────────────────────────────────────────────────────────────┤
+  │ 9    │ 11 test (từ test 1 "thêm vào repo" đến test 11 "repo generic") │
+  ├──────┼────────────────────────────────────────────────────────────────┤
+  │ 10   │ Bonus InteractiveDisplayRemote                                 │
+  └──────┴────────────────────────────────────────────────────────────────┘
+
+> nếu bỏ qua bước 8 làm 11 test thôi có ok k
+
+● Không bỏ hẳn được: 11 test cần có thiết bị và repo để chạy. Đề cũng bắt buộc
+  phần dữ liệu ("Tạo tối thiểu: 3 máy chiếu, 2 điều hòa, 3 micro"). Nhưng bạn
+  không cần tách nó thành một phần riêng, cứ gộp thẳng vào test 1 là được:
+
+  section("1. Thêm thiết bị vào repository")
+  projector_repo = InMemoryRepository[ProjectorRemote]()
+  projector_repo.add(ProjectorRemote("PR01", "Remote 1", "Kho A", 85))
+  projector_repo.add(ProjectorRemote("PR02", "Remote 2", "Kho A", 15))
+  ...
+  print(projector_repo.get_all())
+
+  Như vậy file chỉ còn 11 phần ứng với 11 test, và dữ liệu được tạo ngay trong
+  test 1. Cách này hoàn toàn ổn.
+
+  Chỉ cần giữ 2 điều:
+  - Đủ số lượng tối thiểu: 3 máy chiếu, 2 điều hòa, 3 micro, với thông số khác
+    nhau.
+  - Đúng thứ tự thêm micro: MI01 (chưa sẵn sàng) trước, rồi MI02, rồi MI03. Nhờ
+    vậy test 7 mới thấy FirstAvailable bỏ qua thiết bị chưa sẵn sàng.
+> ok vậy liệt kê lại bước 8-9 đi
+
+● Gộp bước 8 vào bước 9 thì main.py chỉ còn 11 phần, ứng với 11 test. Phần tạo
+  dữ liệu nằm luôn trong test 1.
+
+  Khung file
+
+  from models import *
+
+
+  def section(title: str) -> None:
+      print(f"\n=== {title} ===")
+
+
+  def main() -> None:
+      # 11 test ở đây, theo đúng thứ tự
+      ...
+
+
+  if __name__ == "__main__":
+      main()
+
+  11 test
+
+  #: 1. Thêm vào repo
+  Việc cần làm: Tạo 3 repo InMemoryRepository[...](), add 8 thiết bị. Micro phải
+
+  thêm theo thứ tự MI01, MI02, MI03. In số lượng từng repo
+  Kỳ vọng: 3 / 2 / 3
+  ────────────────────────────────────────
+  #: 2. Trùng mã
+  Việc cần làm: try: projector_repo.add(ProjectorRemote("PR01", ...)), except
+  DuplicateIdException as e: in e.duplicate_id. Thêm else: print("SAI")
+  Kỳ vọng: PR01, repo vẫn 3
+  ────────────────────────────────────────
+  #: 3. Tìm theo mã
+  Việc cần làm: find_by_id("PR03"), find_by_id("XXX")
+  Kỳ vọng: PR03 / None
+  ────────────────────────────────────────
+  #: 4. Lọc sẵn sàng
+  Việc cần làm: projector_repo.find_all(lambda d: d.is_ready_for_use()). Làm với
+
+  micro nữa thì càng tốt
+  Kỳ vọng: PR01, PR03 (· MI02, MI03)
+  ────────────────────────────────────────
+  #: 5. Máy chiếu điểm cao nhất
+  Việc cần làm: projector_service = AllocationService(projector_repo,
+  HighestPriorityStrategy(lambda d: d.get_default_priority_score())), rồi
+  selected_projector = projector_service.allocate()
+  Kỳ vọng: PR01
+  ────────────────────────────────────────
+  #: 6. Điều hòa theo phòng
+  Việc cần làm: ac_service = AllocationService(ac_repo,
+  FirstAvailableStrategy()), rồi allocate(lambda d:
+  d.is_compatible_with("A203"))
+  Kỳ vọng: AC02
+  ────────────────────────────────────────
+  #: 7. Micro đầu tiên sẵn sàng
+  Việc cần làm: mic_service = AllocationService(mic_repo,
+  FirstAvailableStrategy()), rồi allocate()
+  Kỳ vọng: MI02 (MI01 bị bỏ qua)
+  ────────────────────────────────────────
+  #: 8. Đổi chiến lược
+  Việc cần làm: mic_service.return_device("MI02"), in find_candidates(), rồi
+  change_strategy(HighestPriorityStrategy(...)), rồi allocate()
+  Kỳ vọng: Ứng viên MI02, MI03; chọn MI03
+  ────────────────────────────────────────
+  #: 9. Không có ứng viên
+  Việc cần làm: try: ac_service.allocate(lambda d:
+  d.is_compatible_with("Z999")),
+  except NoSuitableItemException. Thêm else: print("SAI")
+  Kỳ vọng: Bắt được lỗi
+  ────────────────────────────────────────
+  #: 10. Chuyển sang Borrowed
+  Việc cần làm: found = projector_repo.find_by_id("PR01"), in found.status,
+  assert found.status == DeviceStatus.BORROWED. Có thể thêm
+  return_device("PR01") rồi in lại
+  Kỳ vọng: BORROWED, rồi AVAILABLE
+  ────────────────────────────────────────
+  #: 11. Repo generic
+  Việc cần làm: Duyệt qua 3 repo, in type(repo).__name__ và loại thiết bị bên
+  trong. In type(projector_repo) is type(mic_repo)
+  Kỳ vọng: Cả 3 đều là InMemoryRepository, kết quả True
+
+  Lưu ý
+
+  - Giữ đúng thứ tự. Các test dùng chung đối tượng: PR01 bị mượn ở test 5 rồi
+    được kiểm ở test 10, MI02 bị mượn ở test 7 rồi được trả ở test 8.
+  - Ở test 8, in thêm type(mic_service.strategy).__name__ trước và sau khi đổi
+    chiến lược, để thấy rõ chiến lược đã thay đổi.
+  - Test 2 và 9 nên có nhánh else, để phát hiện khi lẽ ra phải có lỗi mà lại
+    không có.
+
+  Viết xong thì nhắn "check", mình sẽ chạy python main.py và đối chiếu với cột
+  kỳ vọng.
+
+> check
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● main.py chạy đúng cả 11 test, kết quả khớp với bảng kỳ vọng:
+
+  ┌─────┬───────────────────────────────────────────────────────┬─────┐
+  │  #  │                        Kết quả                        │     │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 1   │ 3 / 2 / 3 thiết bị                                    │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 2   │ Bắt được lỗi trùng PR01, repo vẫn 3                   │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 3   │ Tìm được PR03; XXX ra None                            │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 4   │ PR01, PR03 · MI02, MI03                               │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 5   │ PR01, chuyển sang BORROWED                            │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 6   │ AC02                                                  │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 7   │ MI02 (MI01 pin 20 bị bỏ qua)                          │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 8   │ Từ FirstAvailable đổi sang HighestPriority, chọn MI03 │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 9   │ Bắt được NoSuitableItemException                      │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 10  │ BORROWED, sau khi trả thì AVAILABLE, assert qua       │ ✅  │
+  ├─────┼───────────────────────────────────────────────────────┼─────┤
+  │ 11  │ Cả 3 đều là InMemoryRepository, True                  │ ✅  │
+  └─────┴───────────────────────────────────────────────────────┴─────┘
+
+  Bạn đổi một số thông số so với gợi ý (PR01 pin 90, PR02 pin 10, MI01 (20, 90),
+  MI02 (60, 60)), nhưng kết quả vẫn đúng logic.
+
+  Có 2 chỗ nên thêm để phần "chứng minh" thuyết phục hơn, không bắt buộc:
+
+  Test 8: cho thấy chiến lược cũ sẽ chọn gì. Hiện tại bạn chỉ thấy kết quả của
+  chiến lược mới. Thêm một dòng trước khi đổi:
+  print(f"FirstAvailable sẽ chọn:
+  {mic_service.strategy.select(mic_service.find_candidates())}")
+  Khi đó output có cả MI02 (trước khi đổi) lẫn MI03 (sau khi đổi), nhìn là thấy
+  ngay sự khác biệt. Dòng này chỉ gọi select nên không mượn thiết bị.
+
+  Test 10: chứng minh repo giữ đúng đối tượng đã cấp phát.
+  print(f"Cùng đối tượng với thiết bị được cấp phát: {found is
+  selected_projector}")   # True
+
+  Phần code đã xong. Còn lại:
+  - Bước 10 (bonus): InteractiveDisplayRemote viết trong main.py.
+  - Báo cáo thiết kế (mục 2.1, bắt buộc): trả lời các câu hỏi 2.2 và 4.4, chỉ ra
+    2 (hoặc 3) chỗ dùng đa hình, giải thích ý nghĩa các tham số kiểu T, S, D,
+    và nêu 1 trade-off.
+
+> <ide_opened_file>The user opened the file
+  c:\Users\HHUNG\Desktop\OOP\lab07\main.py in the IDE. This may or may not be
+  related to the current task.</ide_opened_file>
+
+> bước 10 bonus là sao
+
+● Bước 10 dùng để chứng minh câu này ở mục 6.3 của đề:
+
+  ▎ "Nếu bổ sung InteractiveDisplayRemote, dịch vụ cấp phát tổng quát không cần
+  ▎ sửa mã."
+
+  Cũng là yêu cầu số 6 ở phần mô tả nghiệp vụ: "Cho phép bổ sung loại thiết bị …
+  mới mà không sửa nhiều lớp cũ."
+
+  Cách chứng minh là thêm một loại thiết bị mới hoàn toàn, viết trong main.py,
+  rồi cho nó chạy qua InMemoryRepository, HighestPriorityStrategy và
+  AllocationService mà không sửa dòng nào trong models.py.
+
+  Cách làm
+
+  1. Tự đặt quy tắc cho thiết bị mới
+
+  Đề không quy định quy tắc cho loại này, bạn tự chọn. Ví dụ, điều khiển màn
+  hình tương tác:
+  - Thuộc tính battery_level (0–100) và is_paired: bool (đã ghép nối với màn
+    hình hay chưa).
+  - Sẵn sàng khi AVAILABLE, pin ≥ 25 và is_paired là True.
+  - Điểm ưu tiên bằng mức pin, cộng thêm 10 nếu đã ghép nối (hoặc quy tắc nào
+    bạn thích).
+
+  2. Viết lớp trong main.py, đặt trên def main()
+
+  class InteractiveDisplayRemote(TeachingDevice):
+      def __init__(self, device_id, name, storage_location, battery_level,
+  is_paired):
+          # gọi super().__init__(...)
+          # lưu battery_level, is_paired
+          ...
+
+      def is_ready_for_use(self) -> bool: ...
+      def get_default_priority_score(self) -> float: ...
+
+      def get_not_ready_reason(self) -> str:   # không bắt buộc, nhưng cho thấy
+  đa hình
+          # "chưa ghép nối" / "pin x% < 25%" / super()...
+          ...
+  _validate_percent có dấu _ ở đầu, tức là hàm nội bộ của models.py. Lớp mới nên
+  tự kiểm tra pin, hoặc import thẳng from models import _validate_percent. Lưu
+  ý from models import * không import các tên bắt đầu bằng _.
+
+  3. Thêm test 12 ở cuối main()
+
+  section("12. Bonus: thêm loại thiết bị mới")
+  # tạo repo InMemoryRepository[InteractiveDisplayRemote]()
+  # add 3 thiết bị: 1 chưa ghép nối, 1 pin thấp, 1 hợp lệ
+  # AllocationService(repo, HighestPriorityStrategy(...)).allocate()
+  # in kết quả + status
+  # thử borrow() trực tiếp thiết bị chưa ghép nối → in thông báo lỗi
+
+  Kết quả cần thấy
+
+  - Thiết bị hợp lệ được cấp phát và chuyển sang BORROWED.
+  - Thiết bị chưa ghép nối bị loại, thông báo lỗi ghi đúng lý do "chưa ghép
+    nối". Lý do này đến từ get_not_ready_reason() của lớp mới, trong khi
+    exception trong models.py không đổi.
+  - models.py không bị sửa. Trong báo cáo, bạn ghi rõ: "Thêm
+    InteractiveDisplayRemote chỉ cần viết 1 lớp mới kế thừa TeachingDevice;
+    IRepository, ISelectionStrategy, AllocationService không thay đổi."
+
+  Đây chính là nguyên tắc Open/Closed: code mở để mở rộng (thêm lớp mới), nhưng
+  đóng với việc sửa đổi (không phải sửa lớp cũ).
+
+> \export
+
+● \export có vẻ là gõ nhầm của lệnh /export, dùng dấu gạch chéo xuôi /. Đây là
+  lệnh có sẵn của Claude Code để xuất cuộc trò chuyện ra file hoặc clipboard.
+  Mình không chạy lệnh đó thay bạn được, bạn tự gõ /export vào ô chat là xong.
+
+  Nếu ý bạn là muốn xuất thứ khác, ví dụ gom code models.py và main.py thành một
+  file nộp bài, hay viết báo cáo thiết kế ra file .md hoặc .docx, thì nói rõ để
+  mình làm nhé.
